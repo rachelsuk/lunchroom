@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div>
+    <form method="POST" action="/save-form">
+        Food: <input type="text" name="search_term">
+        Location: <input type="text" name="location">
+        <button type="submit">start</button>
+    </form>
+</div>
+
+{% endblock %}
