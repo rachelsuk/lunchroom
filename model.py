@@ -27,7 +27,8 @@ class User(db.Model):
 class YelpHelperSession(db.Model):
     __tablename__ = 'yelphelper_sessions'
 
-    session_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    yelphelper_session_id = db.Column(
+        db.Integer, autoincrement=True, primary_key=True)
     date = db.Column(db.Text, nullable=False)
     location = db.Column(db.Text, nullable=False)
     term = db.Column(db.Text, nullable=False)
@@ -47,11 +48,11 @@ class UserYelpHelperSession(db.Model):
     user_session_id = db.Column(
         db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    session_id = db.Column(db.Integer, db.ForeignKey(
-        'yelphelper_sessions.session_id'))
+    yelphelper_session_id = db.Column(db.Integer, db.ForeignKey(
+        'yelphelper_sessions.yelphelper_session_id'))
 
     def __repr__(self):
-        return f"<User {self.user_id} Session {self.session_id}>"
+        return f"<User {self.user_id} YelpHelper Session {self.session_id}>"
 
 
 class Business(db.Model):
@@ -68,7 +69,7 @@ class Business(db.Model):
     address = db.Column(db.Text)
     distance = db.Column(db.Integer)
     session_id = db.Column(db.Integer, db.ForeignKey(
-        'yelphelper_sessions.session_id'))
+        'yelphelper_sessions.yelphelper_session_id'))
 
     session = db.relationship('YelpHelperSession', backref='businesses')
 
@@ -84,7 +85,7 @@ class Score(db.Model):
         db.Integer, db.ForeignKey('businesses.business_id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     session_id = db.Column(db.Integer, db.ForeignKey(
-        'yelphelper_sessions.session_id'))
+        'yelphelper_sessions.yelphelper_session_id'))
     score = db.Column(db.Integer)
 
     business = db.relationship('Business', backref='scores')
