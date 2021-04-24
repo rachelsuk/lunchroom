@@ -68,13 +68,13 @@ class Business(db.Model):
     price = db.Column(db.Integer)
     address = db.Column(db.Text)
     distance = db.Column(db.Integer)
-    session_id = db.Column(db.Integer, db.ForeignKey(
+    yelphelper_session_id = db.Column(db.Integer, db.ForeignKey(
         'yelphelper_sessions.yelphelper_session_id'))
 
     session = db.relationship('YelpHelperSession', backref='businesses')
 
     def __repr__(self):
-        return f"<Business {self.name} for session {self.session_id}>"
+        return f"<Business {self.name} for session {self.yelphelper_session_id}>"
 
 
 class Score(db.Model):
@@ -84,16 +84,16 @@ class Score(db.Model):
     business_id = db.Column(
         db.Integer, db.ForeignKey('businesses.business_id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    session_id = db.Column(db.Integer, db.ForeignKey(
+    yelphelper_session_id = db.Column(db.Integer, db.ForeignKey(
         'yelphelper_sessions.yelphelper_session_id'))
     score = db.Column(db.Integer)
 
     business = db.relationship('Business', backref='scores')
     user = db.relationship('User', backref='scores')
-    session = db.relationship('YelpHelperSession', backref='scores')
+    yelphelper_session = db.relationship('YelpHelperSession', backref='scores')
 
     def __repr__(self):
-        return f"<Rating by user {self.user_id} for business {self.business_id} during session {self.session_id}>"
+        return f"<Rating by user {self.user_id} for business {self.business_id} during session {self.yelphelper_session_id}>"
 
 
 def connect_to_db(app):
