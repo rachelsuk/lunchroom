@@ -16,8 +16,8 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     fname = db.Column(db.Text, nullable=False)
     lname = db.Column(db.Text, nullable=False)
-    phone = db.Column(db.Integer, nullable=False, unique=True)
-    email = db.Column(db.String(10), nullable=False, unique=True)
+    phone = db.Column(db.Text, nullable=False)
+    email = db.Column(db.Text, nullable=False, unique=True)
     password = db.Column(db.Text, nullable=False)
 
     def __repr__(self):

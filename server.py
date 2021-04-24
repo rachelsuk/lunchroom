@@ -1,7 +1,8 @@
 """Server for YelpHelper"""
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 import model
+import crud
 from model import db, User, YelpHelperSession, UserYelpHelperSession, Business, Score
 import yelp_api
 from datetime import datetime
@@ -19,6 +20,23 @@ def homepage():
 @app.route('/new-user', methods=['POST'])
 def register_user():
     """Create a new user."""
+    fname = request.form.get('fname')
+    lname = request.form.get('lname')
+    phone = request.form.get('phone')
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    if crud.get_user_by_email(email):
+        flash('An account with that email already exists. Please try again.')
+        print('hello')
+    else:
+        new_user = User(fname=fname, lname=lname, phone=phone,
+                        email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Your account was created successfully. You can now login')
+
+    return redirect('/')
 
 
 @app.route('/login', methods=['POST'])
