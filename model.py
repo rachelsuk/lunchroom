@@ -24,9 +24,6 @@ class User(db.Model):
 
 
 class YelpHelperSession(db.Model):
-
-    # change to yelphelpsession
-
     __tablename__ = 'yelphelper_sessions'
 
     session_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
