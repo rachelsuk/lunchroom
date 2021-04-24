@@ -1,12 +1,10 @@
 <html>
-<head>
-</head>
+  <head> </head>
 
-<body>
-
-  {% block body %}
-      BODY OF PAGE GOES HERE VIA INHERITANCE
-  {% endblock %}
-
-</body>
+  <body>
+    {% for msg in get_flashed_messages() %}
+    <p class="flash-msg">{{ msg }}</p>
+    {% endfor %} {% block body %} BODY OF PAGE GOES HERE VIA INHERITANCE {%
+    endblock %}
+  </body>
 </html>
