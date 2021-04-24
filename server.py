@@ -77,6 +77,12 @@ def yelphelper_session_setup():
     db.session.add(yelphelper_session)
     db.session.commit()
 
+    # add user to YelpHelperSession by creating UserYelpHelperSession object (middle table)
+    user_id = session['user_id']
+    user_yelphelper_session = UserYelpHelperSession(
+        user_id=user_id, session_id=yelphelper_session.session_id)
+    db.session.add(user_yelphelper_session)
+
     # connect to yelp API and get 10 restaurants that fit form data criteria
     businesses = yelp_api.business_search(
         location, search_term, price)
