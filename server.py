@@ -1,3 +1,5 @@
+"""Server for YelpHelper"""
+
 from flask import Flask, render_template, request, redirect, url_for
 import model
 from model import db, User, YelpHelperSession, UserYelpHelperSession, Business, Score
