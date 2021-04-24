@@ -1,20 +1,19 @@
 {% extends 'base.html' %}
 {% block body %}
-{% for business in businesses %}
-<div>
-    <b>{{ business.name }}</b>
-    <ul>
+<div id='business-quiz'>
+    <b id='business-name'>{{ business.name }}</b>
+    <ul id='business-info'>
         <li>Number of Yelp Reviews: {{ business.review_count }}</li>
         <li>Number of Yelp Stars: {{ business.yelp_rating }}</li>
     </ul>
-    <form>
+    <form id='business-score'>
         <select name="business_score">
             <option value="0">Absolutely not</option>
             <option value="2">Maybe</option>
             <option value="3">Looks Good!</option>
             <option value="5">This is the place for sure!!!</option>
         </select>
+        <input type='submit'>
     </form>
 </div>
-{% endfor %}
 {% endblock %}
