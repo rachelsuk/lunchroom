@@ -40,7 +40,10 @@ def yelphelper_session_setup():
     # connect to yelp API and get 10 restaurants that fit form data criteria
     businesses = yelp_api.business_search(
         location, search_term, price)
+
+    # loop through each restaurant
     for business in businesses:
+        # pull business data from json and save to database
         alias = business.get("alias")
         name = business.get("name")
         image_url = business.get("image_url")
