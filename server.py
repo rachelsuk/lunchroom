@@ -109,13 +109,12 @@ def yelphelper_session_setup():
         db.session.add(new_business)
     db.session.commit()
 
-    return redirect('/quiz')
+    return redirect(f'/quiz/{yelphelper_session.yelphelper_session_id}')
 
 
-@app.route('/quiz')
-def quiz():
+@app.route('/quiz/<yelphelper_session_id>')
+def quiz(yelphelper_session_id):
     user_id = session['user_id']
-    yelphelper_session_id = session['yelphelper_session_id']
     yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
     businesses = yelphelper_session.businesses
     return render_template('quiz.html', businesses=businesses)
