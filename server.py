@@ -19,6 +19,20 @@ def form():
     return render_template('form.html')
 
 
+@app.route('/yelphelpersession-setup', methods=["POST"])
+def yelphelper_session_setup():
+    """Set up a yelphelper session"""
+
+    # pull form data from POST request
+    date = datetime.today()
+    search_term = request.form.get("search_term")
+    location = request.form.get("location")
+    price = request.form.get("price")
+    min_rating = request.form.get("min_rating")
+
+    return "yelphelper session setup"
+
+
 if __name__ == '__main__':
     model.connect_to_db(app)
     app.run(debug=True, host='0.0.0.0')
