@@ -78,12 +78,12 @@ def yelphelper_session_setup():
     db.session.commit()
 
     # store yelphelper session id in flask session
-    session['yelphelper_session'] = yelphelper_session.session_id
+    session['yelphelper_session_id'] = yelphelper_session.yelphelper_session_id
 
     # add user to YelpHelperSession by creating UserYelpHelperSession object (middle table)
     user_id = session['user_id']
     user_yelphelper_session = UserYelpHelperSession(
-        user_id=user_id, session_id=yelphelper_session.session_id)
+        user_id=user_id, yelphelper_session_id=yelphelper_session.yelphelper_session_id)
     db.session.add(user_yelphelper_session)
 
     # connect to yelp API and get 10 restaurants that fit form data criteria
@@ -105,16 +105,20 @@ def yelphelper_session_setup():
         new_business = Business(alias=alias, name=name, image_url=image_url,
                                 url=url, review_count=review_count,
                                 yelp_rating=yelp_rating, price=price,
-                                address=address, distance=distance, session_id=yelphelper_session.session_id)
+                                address=address, distance=distance, yelphelper_session_id=yelphelper_session.yelphelper_session_id)
         db.session.add(new_business)
     db.session.commit()
 
-    return redirect(url_for())
+    return redirect('/quiz')
 
 
 @app.route('/quiz')
 def quiz():
-    return render_template('quiz.html')
+    user_id = session['user_id']
+    yelphelper_session_id = session['yelphelper_session_id']
+    yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
+    businesses = yelphelper_session.businesses
+    return render_template('quiz.html', businesses=businesses)
 
 
 if __name__ == '__main__':
