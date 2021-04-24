@@ -16,6 +16,11 @@ def homepage():
     return render_template('index.html')
 
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+
 @app.route('/form')
 def form():
     return render_template('form.html')
