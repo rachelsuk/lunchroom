@@ -30,11 +30,15 @@ def yelphelper_session_setup():
     price = request.form.get("price")
     min_rating = request.form.get("min_rating")
 
-    # create yelphelper_session using form data and save to database
+    # create YelpHelperSession object using form data and save to database
     yelphelper_session = YelpHelperSession(date=date, location=location, term=search_term,
                                            price=price, min_rating=min_rating)
     db.session.add(yelphelper_session)
     db.session.commit()
+
+    # connect to yelp API and get 10 restaurants that fit form data criteria
+    businesses = yelp_api.business_search(
+        location, search_term, price, min_rating)
 
     return "yelphelper session setup"
 
