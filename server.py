@@ -16,9 +16,14 @@ def homepage():
     return render_template('index.html')
 
 
-@app.route('/login')
+@app.route('/new-user', methods=['POST'])
+def register_user():
+    """Create a new user."""
+
+
+@app.route('/login', methods=['POST'])
 def login():
-    return render_template('login.html')
+    """Login a user."""
 
 
 @app.route('/form')

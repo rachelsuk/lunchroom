@@ -18,6 +18,7 @@ class User(db.Model):
     lname = db.Column(db.Text, nullable=False)
     phone = db.Column(db.Integer, nullable=False, unique=True)
     email = db.Column(db.String(10), nullable=False, unique=True)
+    password = db.Column(db.Text, nullable=False)
 
     def __repr__(self):
         return f"<User {self.fname} {self.lname}>"
