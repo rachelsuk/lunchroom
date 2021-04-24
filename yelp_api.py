@@ -13,4 +13,4 @@ def business_search(location, search_term, price=None, min_rating=None):
     # Make a request to the Event Search endpoint to search for events
     res = requests.get(url, params=payload, headers=headers)
     search_results = res.json()
-    return search_results['businesses'][10]
+    return search_results['businesses'][:10]

@@ -29,7 +29,7 @@ def yelphelper_session_setup():
     date = datetime.today()
     search_term = request.form.get("search_term")
     location = request.form.get("location")
-    price = request.form.get("price")
+    price = int(request.form.get("price"))
 
     # create YelpHelperSession object using form data and save to database
     yelphelper_session = YelpHelperSession(date=date, location=location, term=search_term,
@@ -45,16 +45,17 @@ def yelphelper_session_setup():
         name = business.get("name")
         image_url = business.get("image_url")
         url = business.get("url")
-        review_count = business.get("review_count")
-        yelp_rating = business.get("rating")
-        price = business.get("price")
+        review_count = int(business.get("review_count"))
+        yelp_rating = int(business.get("rating"))
+        price = len(business.get("price"))
         address = business.get("location").get("display_address")
-        distance = business.get("distance")
+        distance = int(business.get("distance"))
         new_business = Business(alias=alias, name=name, image_url=image_url,
                                 url=url, review_count=review_count,
                                 yelp_rating=yelp_rating, price=price,
-                                address=address, distance=distance)
+                                address=address, distance=distance, session_id=yelphelper_session.session_id)
         db.session.add(new_business)
+    db.session.commit()
 
     return "yelphelper session setup"
 
