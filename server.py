@@ -1,6 +1,6 @@
 """Server for YelpHelper"""
 
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import model
 import crud
 from model import db, User, YelpHelperSession, UserYelpHelperSession, Business, Score
@@ -28,7 +28,6 @@ def register_user():
 
     if crud.get_user_by_email(email):
         flash('An account with that email already exists. Please try again.')
-        print('hello')
     else:
         new_user = User(fname=fname, lname=lname, phone=phone,
                         email=email, password=password)
@@ -42,6 +41,19 @@ def register_user():
 @app.route('/login', methods=['POST'])
 def login():
     """Login a user."""
+    email = request.form.get('email')
+    password = request.form.get('password')
+    user = crud.get_user_by_email(email)
+    if user:
+        if user.password == password:
+            session['user_id'] = user.user_id
+            flash('Logged in!')
+        else:
+            flash('Incorrect password')
+    else:
+        flash('User does not exist.')
+
+    return redirect('/')
 
 
 @app.route('/form')
