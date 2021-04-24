@@ -31,7 +31,6 @@ class YelpHelperSession(db.Model):
     location = db.Column(db.Text, nullable=False)
     term = db.Column(db.Text, nullable=False)
     price = db.Column(db.Integer)
-    min_rating = db.Column(db.Integer)
 
     users = db.relationship("User",
                             secondary="users_yelphelper_sessions",

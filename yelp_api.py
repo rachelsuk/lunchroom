@@ -9,7 +9,7 @@ def business_search(location, search_term, price=None, min_rating=None):
     # Use form data from the user to populate any search parameters
     headers = {'Authorization': 'Bearer %s' % YELP_KEY}
     payload = {'term': search_term, 'location': location,
-               'price': price, 'min_rating': min_rating}
+               'price': price}
     # Make a request to the Event Search endpoint to search for events
     res = requests.get(url, params=payload, headers=headers)
     search_results = res.json()
