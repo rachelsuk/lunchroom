@@ -77,6 +77,9 @@ def yelphelper_session_setup():
     db.session.add(yelphelper_session)
     db.session.commit()
 
+    # store yelphelper session id in flask session
+    session['yelphelper_session'] = yelphelper_session.session_id
+
     # add user to YelpHelperSession by creating UserYelpHelperSession object (middle table)
     user_id = session['user_id']
     user_yelphelper_session = UserYelpHelperSession(
@@ -106,7 +109,12 @@ def yelphelper_session_setup():
         db.session.add(new_business)
     db.session.commit()
 
-    return "yelphelper session setup"
+    return redirect(url_for())
+
+
+@app.route('/quiz')
+def quiz():
+    return render_template('quiz.html')
 
 
 if __name__ == '__main__':
