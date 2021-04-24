@@ -66,9 +66,13 @@ class Business(db.Model):
     price = db.Column(db.Integer)
     address = db.Column(db.Text)
     distance = db.Column(db.Integer)
+    session_id = db.Column(db.Integer, db.ForeignKey(
+        'yelphelper_sessions.session_id'))
+
+    session = db.relationship('YelpHelperSession', backref='businesses')
 
     def __repr__(self):
-        return f"<Business {self.name}>"
+        return f"<Business {self.name} for session {self.session_id}>"
 
 
 class Score(db.Model):
