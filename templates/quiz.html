@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block body %}
+{% for business in businesses %}
+<div>
+    <b>{{ business.name }}</b>
+    <ul>
+        <li>Number of Yelp Reviews: {{ business.review_count }}</li>
+        <li>Number of Yelp Stars: {{ business.yelp_rating }}</li>
+    </ul>
+    <form>
+        <select name="business_score">
+            <option value="0">Absolutely not</option>
+            <option value="2">Maybe</option>
+            <option value="3">Looks Good!</option>
+            <option value="5">This is the place for sure!!!</option>
+        </select>
+    </form>
+</div>
+{% endfor %}
+{% endblock %}
