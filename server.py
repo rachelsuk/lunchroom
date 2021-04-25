@@ -14,7 +14,7 @@ app.secret_key = os.environ['APP_KEY']
 
 @app.route('/')
 def homepage():
-    return render_template('index.html')
+    return render_template('index_react.html')
 
 
 @app.route('/new-user', methods=['POST'])
@@ -48,12 +48,13 @@ def login():
         if user.password == password:
             session['user_id'] = user.user_id
             flash('Logged in!')
+            return redirect('/form')
         else:
             flash('Incorrect password')
+            return redirect('/')
     else:
         flash('User does not exist.')
-
-    return redirect('/')
+        return redirect('/')
 
 
 @app.route('/form')
@@ -112,12 +113,34 @@ def yelphelper_session_setup():
     return redirect(f'/quiz/{yelphelper_session.yelphelper_session_id}')
 
 
-@app.route('/quiz/<yelphelper_session_id>')
+@app.route('/quiz/<yelphelper_session_id>', methods=['GET', 'POST'])
 def quiz(yelphelper_session_id):
-    user_id = session['user_id']
-    yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
-    businesses = yelphelper_session.businesses
-    return render_template('quiz.html', businesses=businesses)
+    return render_template('quiz_react.html')
+
+
+@app.route('/businesses.json')
+def businesses_data():
+    yelphelper_session_businesses = crud.get_businesses_by_yelphelper_session_id(
+        session['yelphelper_session_id'])
+    businesses_list = []
+    for b in yelphelper_session_businesses:
+        businesses_list.append(
+            {"name": b.name, "yelp_rating": b.yelp_rating, "review_count": b.review_count})
+    return {"businesses": businesses_list}
+
+
+@app.route('/save-score', methods=['POST'])
+def save_score():
+    business_index = int(request.form.get('business-index'))
+    score = int(request.form.get('score'))
+    yelphelper_session_businesses = crud.get_businesses_by_yelphelper_session_id(
+        session['yelphelper_session_id'])
+    business = yelphelper_session_businesses[business_index]
+    new_score = Score(business=business, user_id=session['user_id'],
+                      yelphelper_session_id=session['yelphelper_session_id'], score=score)
+    db.session.add(new_score)
+    db.session.commit()
+    return "score has been added."
 
 
 if __name__ == '__main__':
