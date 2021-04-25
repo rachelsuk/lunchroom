@@ -3,6 +3,9 @@ function QuizContainer(props) {
     const [businessIndex, setBusinessIndex] = React.useState(0);
     const [allBusinessesScored, setAllBusinessesScored] = React.useState(false);
 
+    // QUESTION: is the useEffect running each time businessIndex is updated? If so, is 
+    // there a better way to do this since i really only need to fetch the businesses data once?
+
     React.useEffect(() => {
         const getBusinesses = async () => {
             const businessesFromServer = await fetchBusinesses();
@@ -20,6 +23,7 @@ function QuizContainer(props) {
         return data.businesses;
     }
 
+    // Upon submission of business score form, send score data to the server.
     function submitHandler(evt) {
         evt.preventDefault();
 
@@ -41,24 +45,20 @@ function QuizContainer(props) {
 
     return (
         <React.Fragment>
-            {(businesses.length > 0 && !allBusinessesScored) ? <Quiz businesses=
-            {businesses} businessIndex={businessIndex} submitHandler={submitHandler}/> : "loading quiz..."}
+            {(businesses.length > 0 && !allBusinessesScored) ? <Quiz business=
+            {businesses[businessIndex]} submitHandler={submitHandler}/> : null}
+            {allBusinessesScored ? <ResultsContainer />: null}
         </React.Fragment>
     );
 }
 
 function Quiz(props) {
-    const businesses = props.businesses;
-    const businessIndex = props.businessIndex;
+    const business = props.business;
 
     return (
         <React.Fragment>
             <div id='business-quiz'>
-                <b id='business-name'>{businesses[businessIndex].name}</b>
-                <ul id='business-info'>
-                    <li>Number of Yelp Reviews: {businesses[businessIndex].review_count}</li>
-                    <li>Number of Yelp Stars: {businesses[businessIndex].yelp_rating}</li>
-                </ul>
+                <Business business={business}/>
                 <form id='business-score' onSubmit={props.submitHandler}>
                     <select name="business_score">
                         <option value="0">Absolutely not</option>
@@ -69,6 +69,46 @@ function Quiz(props) {
                     <input type='submit'/>
                 </form>
             </div>
+        </React.Fragment>
+    )
+}
+
+function Business(props) {
+    const business = props.business;
+    return (
+        <React.Fragment>
+            <b className='business-name'>{business.name}</b>
+            <ul className='business-details'>
+                <li>Number of Yelp Reviews: {business.review_count}</li>
+                <li>Number of Yelp Stars: {business.yelp_rating}</li>
+            </ul>
+        </React.Fragment>
+    )
+}
+
+function ResultsContainer(props) {
+    const [businessesResults, setBusinessesResults] = React.useState([]);
+    const businessesInfo = [];
+
+    React.useEffect(() => {
+		$.get('/results.json', (result) => {
+			setBusinessesResults(result.total_scores);
+		});
+	},[]);
+
+    for (const business of businessesResults) {
+        businessesInfo.push(
+            <div>
+                <Business business={business}/>
+                <p>{business.total_score}</p>
+            </div>
+            
+
+        );
+    }
+    return (
+        <React.Fragment>
+            <div>{businessesInfo}</div>
         </React.Fragment>
     )
 }

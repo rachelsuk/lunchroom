@@ -140,7 +140,22 @@ def save_score():
                       yelphelper_session_id=session['yelphelper_session_id'], score=score)
     db.session.add(new_score)
     db.session.commit()
+    # QUESTION: is this return statement ok? the ajax call is not using the response for anything.
     return "score has been added."
+
+
+@app.route('/results.json')
+def calculate_results():
+    yelphelper_session_businesses = crud.get_businesses_by_yelphelper_session_id(
+        session['yelphelper_session_id'])
+    total_scores = []
+    total_score = 0
+    for b in yelphelper_session_businesses:
+        for score in b.scores:
+            total_score += score.score
+        total_scores.append({"name": b.name, "yelp_rating": b.yelp_rating,
+                            "review_count": b.review_count, "total_score": total_score})
+    return {"total_scores": total_scores}
 
 
 if __name__ == '__main__':
