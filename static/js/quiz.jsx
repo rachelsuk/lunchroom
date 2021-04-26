@@ -102,8 +102,6 @@ function ResultsContainer(props) {
                 <Business business={business}/>
                 <p>{business.total_score}</p>
             </div>
-            
-
         );
     }
     return (
