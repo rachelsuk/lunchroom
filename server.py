@@ -27,15 +27,16 @@ def register_user():
     password = request.form.get('password')
 
     if crud.get_user_by_email(email):
-        flash('An account with that email already exists. Please try again.')
+        message = 'An account with that email already exists. Please try again.'
     else:
         new_user = User(fname=fname, lname=lname, phone=phone,
                         email=email, password=password)
         db.session.add(new_user)
         db.session.commit()
-        flash('Your account was created successfully. You can now login')
+        session['user_id'] = new_user.user_id
+        message = 'success'
 
-    return redirect('/')
+    return {'message': message}
 
 
 @app.route('/login', methods=['POST'])
@@ -47,14 +48,13 @@ def login():
     if user:
         if user.password == password:
             session['user_id'] = user.user_id
-            flash('Logged in!')
-            return redirect('/form')
+            message = "success"
         else:
-            flash('Incorrect password')
-            return redirect('/')
+            message = "wrong password"
     else:
-        flash('User does not exist.')
-        return redirect('/')
+        message = "user does not exist"
+
+    return {'message': message}
 
 
 @app.route('/form')
@@ -77,15 +77,6 @@ def yelphelper_session_setup():
                                            price=price)
     db.session.add(yelphelper_session)
     db.session.commit()
-
-    # store yelphelper session id in flask session
-    session['yelphelper_session_id'] = yelphelper_session.yelphelper_session_id
-
-    # add user to YelpHelperSession by creating UserYelpHelperSession object (middle table)
-    user_id = session['user_id']
-    user_yelphelper_session = UserYelpHelperSession(
-        user_id=user_id, yelphelper_session_id=yelphelper_session.yelphelper_session_id)
-    db.session.add(user_yelphelper_session)
 
     # connect to yelp API and get 10 restaurants that fit form data criteria
     businesses = yelp_api.business_search(
@@ -110,10 +101,38 @@ def yelphelper_session_setup():
         db.session.add(new_business)
     db.session.commit()
 
-    return redirect(f'/quiz/{yelphelper_session.yelphelper_session_id}')
+    return redirect(f'/invite/{yelphelper_session.yelphelper_session_id}')
 
 
-@app.route('/quiz/<yelphelper_session_id>', methods=['GET', 'POST'])
+@app.route('/invite/<yelphelper_session_id>')
+def invite_friends(yelphelper_session_id):
+    # store yelphelper session id in flask session
+    # NEED TO FIND ANOTHER WAY TO ACCESS YELPHELPER SESSION?
+    session['yelphelper_session_id'] = yelphelper_session_id
+    return render_template('invite.html')
+
+
+@app.route('/yelphelper-session-participants.json')
+def participants_data():
+    yelphelper_session = YelpHelperSession.query.get(
+        int(session['yelphelper_session_id']))
+    logged_in = False
+    if 'user_id' in session:
+        logged_in = True
+        # add user to YelpHelperSession by creating UserYelpHelperSession object (middle table)
+        user_id = session['user_id']
+        user_yelphelper_session = UserYelpHelperSession(
+            user_id=user_id, yelphelper_session_id=yelphelper_session.yelphelper_session_id)
+        db.session.add(user_yelphelper_session)
+        db.session.commit()
+    participants = yelphelper_session.users
+    participant_list = []
+    for p in participants:
+        participant_list.append({"fname": p.fname})
+    return {"participants": participant_list, "logged_in": logged_in}
+
+
+@app.route('/quiz/<yelphelper_session_id>')
 def quiz(yelphelper_session_id):
     return render_template('quiz_react.html')
 
@@ -146,15 +165,13 @@ def save_score():
 
 @app.route('/results.json')
 def calculate_results():
-    yelphelper_session_businesses = crud.get_businesses_by_yelphelper_session_id(
+    ordered_total_scores = crud.get_ordered_total_scores(
         session['yelphelper_session_id'])
     total_scores = []
-    total_score = 0
-    for b in yelphelper_session_businesses:
-        for score in b.scores:
-            total_score += score.score
+    for total_score in ordered_total_scores:
+        b = Business.query.get(total_score.business_id)
         total_scores.append({"name": b.name, "yelp_rating": b.yelp_rating,
-                            "review_count": b.review_count, "total_score": total_score})
+                            "review_count": b.review_count, "total_score": total_score.total_score})
     return {"total_scores": total_scores}
 
 
