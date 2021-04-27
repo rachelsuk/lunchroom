@@ -21,6 +21,7 @@ function LoginForm(props) {
     
     return (
         <React.Fragment>
+            {props.errorMessage ? <ErrorMessage errorMessage={props.errorMessage} /> : null}
             <h2>Login</h2>
             <form onSubmit={loginHandler} id="login-form">
                 Email <input type="text" name="email" />
