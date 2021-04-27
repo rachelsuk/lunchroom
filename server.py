@@ -105,14 +105,14 @@ def yelphelper_session_setup():
 
 
 @app.route('/invite/<yelphelper_session_id>')
-def invite_friends(yelphelper_session_id):
+def invite(yelphelper_session_id):
     # store yelphelper session id in flask session
     # NEED TO FIND ANOTHER WAY TO ACCESS YELPHELPER SESSION?
     session['yelphelper_session_id'] = yelphelper_session_id
     return render_template('invite.html')
 
 
-@app.route('/yelphelper-session-participants.json')
+@app.route('/yelphelper-session-participants.json', methods=['GET', 'POST'])
 def participants_data():
     yelphelper_session = YelpHelperSession.query.get(
         int(session['yelphelper_session_id']))
@@ -121,19 +121,26 @@ def participants_data():
         logged_in = True
         # add user to YelpHelperSession by creating UserYelpHelperSession object (middle table)
         user_id = session['user_id']
-        user_yelphelper_session = UserYelpHelperSession(
-            user_id=user_id, yelphelper_session_id=yelphelper_session.yelphelper_session_id)
-        db.session.add(user_yelphelper_session)
-        db.session.commit()
+        user_yelphelper_session = UserYelpHelperSession.query.filter_by(
+            user_id=user_id, yelphelper_session_id=session['yelphelper_session_id']).first()
+        if not user_yelphelper_session:
+            user_yelphelper_session = UserYelpHelperSession(
+                user_id=user_id, yelphelper_session_id=yelphelper_session.yelphelper_session_id)
+            db.session.add(user_yelphelper_session)
+            db.session.commit()
     participants = yelphelper_session.users
     participant_list = []
     for p in participants:
         participant_list.append({"fname": p.fname})
-    return {"participants": participant_list, "logged_in": logged_in}
+    if request.method == 'POST':
+        yelphelper_session.started = True
+        db.session.add(yelphelper_session)
+        db.session.commit()
+    return {"participants": participant_list, "logged_in": logged_in, "started": yelphelper_session.started}
 
 
-@app.route('/quiz/<yelphelper_session_id>')
-def quiz(yelphelper_session_id):
+@app.route('/quiz')
+def quiz():
     return render_template('quiz_react.html')
 
 
@@ -159,8 +166,40 @@ def save_score():
                       yelphelper_session_id=session['yelphelper_session_id'], score=score)
     db.session.add(new_score)
     db.session.commit()
-    # QUESTION: is this return statement ok? the ajax call is not using the response for anything.
     return "score has been added."
+
+
+@app.route('/user-completed', methods=['POST'])
+def user_completed():
+    user_id = session['user_id']
+    yelphelper_session_id = session['yelphelper_session_id']
+    user_yelphelper_session = UserYelpHelperSession.query.filter(
+        UserYelpHelperSession.user_id == user_id, UserYelpHelperSession.yelphelper_session_id == yelphelper_session_id).first()
+    user_yelphelper_session.completed = True
+    db.session.add(user_yelphelper_session)
+    db.session.commit()
+    return "user has been updated."
+
+
+@app.route('/check-all-completed', methods=['POST'])
+def check_all_completed():
+    yelphelper_session_id = session['yelphelper_session_id']
+    all_completed = True
+    for user in (crud.get_user_yelphelper_sessions(yelphelper_session_id)):
+        if not user.completed:
+            all_completed = False
+            break
+    if all_completed:
+        yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
+        yelphelper_session.completed = True
+        db.session.add(yelphelper_session)
+        db.session.commit()
+    return {"all_completed": all_completed}
+
+
+@app.route('/result')
+def show_result():
+    return render_template('result.html')
 
 
 @app.route('/results.json')
