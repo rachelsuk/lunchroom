@@ -28,3 +28,11 @@ def get_ordered_total_scores(yelphelper_session_id):
         "business_id")).filter(Score.yelphelper_session_id == yelphelper_session_id).group_by(Score.business_id).order_by(desc(func.sum(Score.score))).all()
 
     return ordered_total_scores
+
+
+def get_user_yelphelper_sessions(yelphelper_session_id):
+    """Get users_yelphelper_sessions for a yelphelper session."""
+    users_yelphelper_sessions = db.session.query(UserYelpHelperSession).filter(
+        UserYelpHelperSession.yelphelper_session_id == yelphelper_session_id).all()
+
+    return users_yelphelper_sessions
