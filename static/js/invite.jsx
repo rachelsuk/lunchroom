@@ -9,8 +9,11 @@ function Invite(props) {
             $.get('/yelphelper-session-participants.json', (res) => {
                 setParticipants(res.participants);
                 if (res.logged_in) {
-                setLoggedIn(true);
-                };
+                    setLoggedIn(true);
+                }
+                if (res.started) {
+                    window.location.replace("/quiz");
+                }
             });
         }, 1000);
         return () => clearInterval(interval);
@@ -20,12 +23,21 @@ function Invite(props) {
         pass
     }
 
+    function startQuiz() {
+        $.post('/yelphelper-session-participants.json', (res) => {
+            if (res.started) {
+                window.location.replace("/quiz");
+            }
+        })
+    }
+
     return (
         <React.Fragment>
             {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
             {loggedIn ? <ParticipantList participants={participants} /> : null}
             {!loggedIn ? <NewUserForm setErrorMessage={setErrorMessage} onSuccess={onSuccess} /> : null}
             {!loggedIn ? <LoginForm setErrorMessage={setErrorMessage} onSuccess={onSuccess} /> : null}
+            {loggedIn ? <button onClick={startQuiz}>Let's Start!</button> : null}
         </React.Fragment>
     );
 }
