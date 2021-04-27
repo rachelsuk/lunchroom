@@ -33,6 +33,8 @@ class YelpHelperSession(db.Model):
     location = db.Column(db.Text, nullable=False)
     term = db.Column(db.Text, nullable=False)
     price = db.Column(db.Integer)
+    started = db.Column(db.Boolean, default=False)
+    completed = db.Column(db.Boolean, default=False)
 
     users = db.relationship("User",
                             secondary="users_yelphelper_sessions",
@@ -50,6 +52,7 @@ class UserYelpHelperSession(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     yelphelper_session_id = db.Column(db.Integer, db.ForeignKey(
         'yelphelper_sessions.yelphelper_session_id'))
+    completed = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<User {self.user_id} YelpHelper Session {self.yelphelper_session_id}>"
