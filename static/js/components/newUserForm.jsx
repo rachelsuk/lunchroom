@@ -24,6 +24,7 @@ function NewUserForm(props) {
 
     return (
         <React.Fragment>
+            {props.errorMessage ? <ErrorMessage errorMessage={props.errorMessage} /> : null}
             <h2>Create an Account</h2>
             <form onSubmit={registerUserHandler} id="new-user-form">
                 First Name <input type="text" name="fname" />
