@@ -1,6 +1,5 @@
-function YelpHelper(props) {
+function Login(props) {
     const [errorMessage, setErrorMessage] = React.useState(null);
-
 
     const onSuccess = async () => {
         window.location.replace("/form");
@@ -8,9 +7,8 @@ function YelpHelper(props) {
 
     return (
         <React.Fragment>
-            {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
-            <NewUserForm setErrorMesssage={setErrorMessage} onSuccess={onSuccess} />
-            <LoginForm setErrorMessage={setErrorMessage} onSuccess={onSuccess} />
+            <LoginForm setErrorMessage={setErrorMessage} errorMessage={errorMessage} onSuccess={onSuccess} />
+            <a href="/new-user">I'm new here!</a> 
         </React.Fragment>
     );
 }
@@ -18,6 +16,6 @@ function YelpHelper(props) {
 
 
 ReactDOM.render(
-    <YelpHelper />,
+    <Login />,
     document.querySelector('#root')
 );
