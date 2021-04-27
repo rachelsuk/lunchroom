@@ -10,7 +10,7 @@ function ResultsContainer(props) {
 
     for (const business of businessesResults) {
         businessesInfo.push(
-            <div>
+            <div className="business" key={business.alias}>
                 <Business business={business}/>
                 <p>{business.total_score}</p>
             </div>
