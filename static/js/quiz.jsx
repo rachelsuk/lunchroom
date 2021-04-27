@@ -13,6 +13,14 @@ function QuizContainer(props) {
         }
 
         getBusinesses();
+
+        const interval = setInterval(() => {
+            $.post('/check-all-completed', (res) => {
+                if (res.all_completed) {
+                    window.location.replace("/result");  
+                }
+            });
+        }, 1000);
     }, [])
 
     // Fetch Businesses
@@ -37,17 +45,17 @@ function QuizContainer(props) {
             }
             else {
                 setAllBusinessesScored(true);
+                fetch('/user-completed', {method: 'POST'});
             }
-            
         });
 
     }
 
     return (
         <React.Fragment>
-            {(businesses.length > 0 && !allBusinessesScored) ? <Quiz business=
+            {(businesses.length && !allBusinessesScored) > 0 ? <Quiz business=
             {businesses[businessIndex]} submitHandler={submitHandler}/> : null}
-            {allBusinessesScored ? <ResultsContainer />: null}
+            {allBusinessesScored ? <Wait /> : null}
         </React.Fragment>
     );
 }
@@ -73,42 +81,8 @@ function Quiz(props) {
     )
 }
 
-function Business(props) {
-    const business = props.business;
-    return (
-        <React.Fragment>
-            <b className='business-name'>{business.name}</b>
-            <ul className='business-details'>
-                <li>Number of Yelp Reviews: {business.review_count}</li>
-                <li>Number of Yelp Stars: {business.yelp_rating}</li>
-            </ul>
-        </React.Fragment>
-    )
-}
-
-function ResultsContainer(props) {
-    const [businessesResults, setBusinessesResults] = React.useState([]);
-    const businessesInfo = [];
-
-    React.useEffect(() => {
-		$.get('/results.json', (result) => {
-			setBusinessesResults(result.total_scores);
-		});
-	},[]);
-
-    for (const business of businessesResults) {
-        businessesInfo.push(
-            <div>
-                <Business business={business}/>
-                <p>{business.total_score}</p>
-            </div>
-        );
-    }
-    return (
-        <React.Fragment>
-            <div>{businessesInfo}</div>
-        </React.Fragment>
-    )
+function Wait(props) {
+    return (<div>Waiting for all participants to finish...</div>)
 }
 
 ReactDOM.render(
