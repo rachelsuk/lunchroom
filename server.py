@@ -14,7 +14,14 @@ app.secret_key = os.environ['APP_KEY']
 
 @app.route('/')
 def homepage():
+    if 'user_id' in session:
+        return redirect('/form')
     return render_template('index_react.html')
+
+
+@app.route('/new-user')
+def new_user():
+    return render_template('new_user.html')
 
 
 @app.route('/new-user', methods=['POST'])
@@ -151,7 +158,7 @@ def businesses_data():
     businesses_list = []
     for b in yelphelper_session_businesses:
         businesses_list.append(
-            {"name": b.name, "yelp_rating": b.yelp_rating, "review_count": b.review_count})
+            {"alias": b.alias, "name": b.name, "yelp_rating": b.yelp_rating, "review_count": b.review_count, "image_url": b.image_url, "url": b.url})
     return {"businesses": businesses_list}
 
 
@@ -209,8 +216,8 @@ def calculate_results():
     total_scores = []
     for total_score in ordered_total_scores:
         b = Business.query.get(total_score.business_id)
-        total_scores.append({"name": b.name, "yelp_rating": b.yelp_rating,
-                            "review_count": b.review_count, "total_score": total_score.total_score})
+        total_scores.append({"alias": b.alias, "name": b.name, "yelp_rating": b.yelp_rating,
+                            "review_count": b.review_count, "image_url": b.image_url, "url": b.url, "total_score": total_score.total_score})
     return {"total_scores": total_scores}
 
 
