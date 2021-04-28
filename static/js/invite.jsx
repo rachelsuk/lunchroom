@@ -1,10 +1,13 @@
+const Router = window.ReactRouterDOM.BrowserRouter;
+const Route =  window.ReactRouterDOM.Route;
+const Link =  window.ReactRouterDOM.Link;
+
 function Invite(props) {
     const [participants, setParticipants] = React.useState([]);
     const [loggedIn, setLoggedIn] = React.useState(false);
-    const [errorMessage, setErrorMessage] = React.useState(null);
-
-
+    
     React.useEffect(() => {
+        const url = window.location.href;
         const interval = setInterval(() => {
             $.get('/yelphelper-session-participants.json', (res) => {
                 setParticipants(res.participants);
@@ -28,17 +31,17 @@ function Invite(props) {
             if (res.started) {
                 window.location.replace("/quiz");
             }
-        })
+        });
     }
 
     return (
-        <React.Fragment>
-            {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
+        <Router>
             {loggedIn ? <ParticipantList participants={participants} /> : null}
-            {!loggedIn ? <NewUserForm setErrorMessage={setErrorMessage} onSuccess={onSuccess} /> : null}
-            {!loggedIn ? <LoginForm setErrorMessage={setErrorMessage} onSuccess={onSuccess} /> : null}
             {loggedIn ? <button onClick={startQuiz}>Let's Start!</button> : null}
-        </React.Fragment>
+            {!loggedIn ? <LoginForm onSuccess={onSuccess} /> : null}
+            <Route path='/login' exact render={(props) => <LoginForm onSuccess={onSuccess} />} />
+            <Route path='/new-user' exact render={(props) => <NewUserForm onSuccess={onSuccess} />} />
+        </Router>
     );
 }
 
@@ -47,7 +50,7 @@ function ParticipantList(props) {
     const participantsInfo = [];
     for (const participant of participants) {
         participantsInfo.push(
-            <p>{participant.fname}</p>
+            <p key={`user${participant.user_id}`}>{participant.fname}</p>
         );
     }
     return (
