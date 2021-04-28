@@ -14,17 +14,10 @@ app.secret_key = os.environ['APP_KEY']
 
 @app.route('/')
 def homepage():
-    if 'user_id' in session:
-        return redirect('/form')
-    return render_template('index_react.html')
+    return render_template('index.html')
 
 
-@app.route('/new-user')
-def new_user():
-    return render_template('new_user.html')
-
-
-@app.route('/new-user', methods=['POST'])
+@app.route('/new-user.json', methods=['POST'])
 def register_user():
     """Create a new user."""
     fname = request.form.get('fname')
@@ -46,7 +39,7 @@ def register_user():
     return {'message': message}
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/process-login', methods=['POST'])
 def login():
     """Login a user."""
     email = request.form.get('email')
@@ -138,7 +131,7 @@ def participants_data():
     participants = yelphelper_session.users
     participant_list = []
     for p in participants:
-        participant_list.append({"fname": p.fname})
+        participant_list.append({"user_id": p.user_id, "fname": p.fname})
     if request.method == 'POST':
         yelphelper_session.started = True
         db.session.add(yelphelper_session)
@@ -148,7 +141,7 @@ def participants_data():
 
 @app.route('/quiz')
 def quiz():
-    return render_template('quiz_react.html')
+    return render_template('quiz.html')
 
 
 @app.route('/businesses.json')
