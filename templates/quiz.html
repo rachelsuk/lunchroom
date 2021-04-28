@@ -1,23 +1,15 @@
 {% extends 'base.html' %}
 {% block title %} YelpHelper {% endblock %}
+
 {% block head %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
 {% endblock %}
+
 {% block body %}
-<div id='business-quiz'>
-    <b id='business-name'>{{ business.name }}</b>
-    <ul id='business-info'>
-        <li>Number of Yelp Reviews: {{ business.review_count }}</li>
-        <li>Number of Yelp Stars: {{ business.yelp_rating }}</li>
-    </ul>
-    <form id='business-score'>
-        <select name="business_score">
-            <option value="0">Absolutely not</option>
-            <option value="2">Maybe</option>
-            <option value="3">Looks Good!</option>
-            <option value="5">This is the place for sure!!!</option>
-        </select>
-        <input type='submit'>
-    </form>
-</div>
-<script src="/static/js/quiz.js"></script>
+    <div id="root"></div>
+
+    <script src="/static/js/components/business.jsx" type="text/jsx"></script>
+    <script src="/static/js/quiz.jsx" type="text/jsx"></script>
 {% endblock %}
