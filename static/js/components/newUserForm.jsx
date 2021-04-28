@@ -1,4 +1,7 @@
+const Link =  window.ReactRouterDOM.Link;
+
 function NewUserForm(props) {
+    const [errorMessage, setErrorMessage] = React.useState(null);
 
     function registerUserHandler(evt) {
         evt.preventDefault();
@@ -12,19 +15,19 @@ function NewUserForm(props) {
             'email': newUserForm.email.value,
             'password': newUserForm.password.value
         };
-        $.post('/new-user', formData, (res) => {
+        $.post('/new-user.json', formData, (res) => {
             if (res.message === 'success') {
                 props.onSuccess();
             }
             else {
-                props.setErrorMessage(res.message);
+                setErrorMessage(res.message);
             }
         });
     }
 
     return (
         <React.Fragment>
-            {props.errorMessage ? <ErrorMessage errorMessage={props.errorMessage} /> : null}
+            {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
             <h2>Create an Account</h2>
             <form onSubmit={registerUserHandler} id="new-user-form">
                 First Name <input type="text" name="fname" />
@@ -34,6 +37,7 @@ function NewUserForm(props) {
                 Password <input type="password" name="password" />
                 <input type="submit" />
             </form>
+            <Link to='/login'>Go Back to Login.</Link>
         </React.Fragment>
     );
 }
