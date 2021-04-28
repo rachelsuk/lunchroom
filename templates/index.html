@@ -1,23 +1,21 @@
 {% extends 'base.html' %}
+{% block title %} YelpHelper {% endblock %}
+
+{% block head %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-router/umd/react-router.min.js"></script>
+    <script src="https://unpkg.com/react-router-dom/umd/react-router-dom.min.js"></script>
+{% endblock %}
+
 {% block body %}
-<div>
-  <a href="/form">Click Here to Start</a>
-  <h2>Create an Account</h2>
-  <form action="/new-user" method="POST">
-    First Name <input type="text" name="fname" /> Last Name
-    <input type="text" name="lname" /> Phone Number
-    <input type="text" name="phone" /> Email
-    <input type="text" name="email" /> Password
-    <input type="password" name="password" />
-    <input type="submit" />
-  </form>
+    <div id="root"></div>
 
-  <h2>Login</h2>
-  <form action="/login" method="POST">
-    Email <input type="text" name="email" /> Password
-    <input type="password" name="password" />
-    <input type="submit" />
-  </form>
-</div>
-
+    
+    <script src="/static/js/components/errorMessage.jsx" type="text/jsx"></script>
+    <script src="/static/js/components/loginForm.jsx" type="text/jsx"></script>
+    <script src="/static/js/components/newUserForm.jsx" type="text/jsx"></script>
+    <script src="/static/js/components/header.jsx" type="text/jsx"></script>
+    <script src="/static/js/homepage.jsx" type="text/jsx"></script>
 {% endblock %}
