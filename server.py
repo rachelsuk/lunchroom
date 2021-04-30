@@ -17,6 +17,19 @@ def homepage():
     return render_template('index.html')
 
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+
+@app.route('/check-login.json')
+def check_login():
+    logged_in = False
+    if 'user_id' in session:
+        logged_in = True
+    return {'logged_in': logged_in}
+
+
 @app.route('/new-user.json', methods=['POST'])
 def register_user():
     """Create a new user."""
@@ -39,8 +52,8 @@ def register_user():
     return {'message': message}
 
 
-@app.route('/process-login', methods=['POST'])
-def login():
+@app.route('/process-login.json', methods=['POST'])
+def process_login():
     """Login a user."""
     email = request.form.get('email')
     password = request.form.get('password')
@@ -57,9 +70,16 @@ def login():
     return {'message': message}
 
 
-@app.route('/form')
+@app.route('/process-logout')
+def process_logout():
+    """Logout a user."""
+    session.clear()
+    return "user has been logged out."
+
+
+@app.route('/criteria-form')
 def form():
-    return render_template('form.html')
+    return render_template('criteria_form.html')
 
 
 @app.route('/yelphelpersession-setup', methods=["POST"])
@@ -107,7 +127,6 @@ def yelphelper_session_setup():
 @app.route('/invite/<yelphelper_session_id>')
 def invite(yelphelper_session_id):
     # store yelphelper session id in flask session
-    # NEED TO FIND ANOTHER WAY TO ACCESS YELPHELPER SESSION?
     session['yelphelper_session_id'] = yelphelper_session_id
     return render_template('invite.html')
 
