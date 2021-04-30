@@ -1,5 +1,3 @@
-const Link =  window.ReactRouterDOM.Link;
-
 function NewUserForm(props) {
     const [errorMessage, setErrorMessage] = React.useState(null);
 
@@ -37,7 +35,6 @@ function NewUserForm(props) {
                 Password <input type="password" name="password" />
                 <input type="submit" />
             </form>
-            <Link to='/login'>Go Back to Login.</Link>
         </React.Fragment>
     );
 }
