@@ -1,24 +1,12 @@
-const Router = window.ReactRouterDOM.BrowserRouter;
-const Route =  window.ReactRouterDOM.Route;
-const Link =  window.ReactRouterDOM.Link;
-
 function Homepage(props) {
 
-    function onSuccess() {
-        window.location.replace("/");
-    }
+    const url = window.location.href;
 
     return (
-        <Router>
-            <Header />
-            <Route path='/login' exact render={(props) => (
-                <LoginForm onSuccess={onSuccess}/>
-			)} />
-            <Route path='/new-user' exact render={(props) => (
-                <NewUserForm onSuccess={onSuccess}/>
-			)} />
-            <a href="/form">Start</a>
-        </Router>
+        <React.Fragment>
+            <Header url={url}/>
+            <a href="/criteria-form">Start</a>
+        </React.Fragment>
     );
 }
 
