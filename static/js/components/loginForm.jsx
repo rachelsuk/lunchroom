@@ -1,5 +1,3 @@
-const Link =  window.ReactRouterDOM.Link;
-
 function LoginForm(props) {
     const [errorMessage, setErrorMessage] = React.useState(null);
 
@@ -10,7 +8,7 @@ function LoginForm(props) {
             'email': document.querySelector('#login-form').elements.email.value,
             'password': document.querySelector('#login-form').elements.password.value
         };
-        $.post('/process-login', formData, (res) => {
+        $.post('/process-login.json', formData, (res) => {
             
             if (res.message === "success") {
                 props.onSuccess();
@@ -32,7 +30,6 @@ function LoginForm(props) {
                 Password <input type="password" name="password" />
                 <input type="submit" />
             </form>
-            <Link to='/new-user'>I'm new here!</Link>
         </React.Fragment>
     );
 }
