@@ -1,19 +1,20 @@
-const Router = window.ReactRouterDOM.BrowserRouter;
-const Route =  window.ReactRouterDOM.Route;
-const Link =  window.ReactRouterDOM.Link;
-
 function Invite(props) {
     const [participants, setParticipants] = React.useState([]);
     const [loggedIn, setLoggedIn] = React.useState(false);
+
+    const url = window.location.href;
     
     React.useEffect(() => {
-        const url = window.location.href;
         const interval = setInterval(() => {
             $.get('/yelphelper-session-participants.json', (res) => {
                 setParticipants(res.participants);
                 if (res.logged_in) {
                     setLoggedIn(true);
                 }
+                else {
+                    window.location.replace(`/login?url=${url}`);
+                }
+
                 if (res.started) {
                     window.location.replace("/quiz");
                 }
@@ -21,10 +22,6 @@ function Invite(props) {
         }, 1000);
         return () => clearInterval(interval);
     },[]);
-
-    function onSuccess() {
-        pass
-    }
 
     function startQuiz() {
         $.post('/yelphelper-session-participants.json', (res) => {
@@ -35,13 +32,10 @@ function Invite(props) {
     }
 
     return (
-        <Router>
-            {loggedIn ? <ParticipantList participants={participants} /> : null}
-            {loggedIn ? <button onClick={startQuiz}>Let's Start!</button> : null}
-            {!loggedIn ? <LoginForm onSuccess={onSuccess} /> : null}
-            <Route path='/login' exact render={(props) => <LoginForm onSuccess={onSuccess} />} />
-            <Route path='/new-user' exact render={(props) => <NewUserForm onSuccess={onSuccess} />} />
-        </Router>
+        <React.Fragment>
+            <ParticipantList participants={participants} />
+            <button onClick={startQuiz}>Let's Start!</button>
+        </React.Fragment>
     );
 }
 
