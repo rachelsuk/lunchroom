@@ -16,8 +16,10 @@ function ResultsContainer(props) {
             </div>
         );
     }
+
     return (
         <React.Fragment>
+            <GoogleMap businesses = {businessesResults}/>
             <div>{businessesInfo}</div>
         </React.Fragment>
     )
@@ -27,3 +29,4 @@ ReactDOM.render(
     <ResultsContainer />,
     document.querySelector('#root')
 );
+
