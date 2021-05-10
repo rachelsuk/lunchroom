@@ -114,10 +114,14 @@ def yelphelper_session_setup():
         price = len(business.get("price"))
         address = business.get("location").get("display_address")
         distance = int(business.get("distance"))
+        lat = int(business.get("coordinates").get("latitude"))
+        lng = int(business.get("coordinates").get("longitude"))
         new_business = Business(alias=alias, name=name, image_url=image_url,
                                 url=url, review_count=review_count,
                                 yelp_rating=yelp_rating, price=price,
-                                address=address, distance=distance, yelphelper_session_id=yelphelper_session.yelphelper_session_id)
+                                address=address, distance=distance,
+                                lat=lat, lng=lng,
+                                yelphelper_session_id=yelphelper_session.yelphelper_session_id)
         db.session.add(new_business)
     db.session.commit()
 
@@ -229,7 +233,9 @@ def calculate_results():
     for total_score in ordered_total_scores:
         b = Business.query.get(total_score.business_id)
         total_scores.append({"alias": b.alias, "name": b.name, "yelp_rating": b.yelp_rating,
-                            "review_count": b.review_count, "image_url": b.image_url, "url": b.url, "total_score": total_score.total_score})
+                            "review_count": b.review_count, "image_url": b.image_url, "url": b.url, "total_score": total_score.total_score,
+                             "lat": b.lat, "lng": b.lng})
+    print(total_scores)
     return {"total_scores": total_scores}
 
 
