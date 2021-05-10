@@ -5,11 +5,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script
+    async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBK2MfjfGqyN9RhjvbXtMK369AX5uKGTfw&libraries=map">
+  </script>
 {% endblock %}
 
 {% block body %}
     <div id="root"></div>
 
+
     <script src="/static/js/components/business.jsx" type="text/jsx"></script>
+    <script src="/static/js/components/map.jsx" type="text/jsx"></script>
     <script src="/static/js/result.jsx" type="text/jsx"></script>
+
+
 {% endblock %}
