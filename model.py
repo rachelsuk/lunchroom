@@ -71,6 +71,8 @@ class Business(db.Model):
     price = db.Column(db.Integer)
     address = db.Column(db.Text)
     distance = db.Column(db.Integer)
+    lat = db.Column(db.Float)
+    lng = db.Column(db.Float)
     yelphelper_session_id = db.Column(db.Integer, db.ForeignKey(
         'yelphelper_sessions.yelphelper_session_id'))
 
