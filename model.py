@@ -53,6 +53,8 @@ class UserYelpHelperSession(db.Model):
     yelphelper_session_id = db.Column(db.Integer, db.ForeignKey(
         'yelphelper_sessions.yelphelper_session_id'))
     completed = db.Column(db.Boolean, default=False)
+    lat = db.Column(db.Float)
+    lng = db.Column(db.Float)
 
     def __repr__(self):
         return f"<User {self.user_id} YelpHelper Session {self.yelphelper_session_id}>"
