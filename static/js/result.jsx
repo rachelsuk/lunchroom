@@ -19,6 +19,7 @@ function ResultsContainer(props) {
 
     return (
         <React.Fragment>
+            <a href={'/'}>Return to Homepage</a>
             <GoogleMap businesses = {businessesResults}/>
             <div>{businessesInfo}</div>
         </React.Fragment>
