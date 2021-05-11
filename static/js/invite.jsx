@@ -1,3 +1,6 @@
+// https://www.w3schools.com/html/html5_geolocation.asp
+// https://web.dev/how-to-use-local-https/
+
 function Invite(props) {
     const [participants, setParticipants] = React.useState([]);
     const [loggedIn, setLoggedIn] = React.useState(false);
@@ -19,9 +22,33 @@ function Invite(props) {
                     window.location.replace("/quiz");
                 }
             });
-        }, 1000);
+        }, 300);
         return () => clearInterval(interval);
     },[]);
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            const currentPosition = navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    console.log(position);
+                  },
+                  function(error) {
+                    console.error("Error Code = " + error.code + " - " + error.message);
+                  }
+            );   
+        } else {
+            const currentPosition = {'coords': {'latitude': null, 'longitude': null}};
+        }
+
+        const positionData = {
+            'lat': currentPosition.coords.latitude,
+            'lng': currentPosition.coords.longitude
+        }
+
+        $.post('/add-user-position', positionData, (res) => {
+            console.log(res)
+        });
+    }
 
     function startQuiz() {
         $.post('/yelphelper-session-participants.json', (res) => {
@@ -34,12 +61,14 @@ function Invite(props) {
     return (
         <React.Fragment>
             <ParticipantList participants={participants} />
+            <button onClick={getLocation}>Allow Access to My Location.</button>
             <button onClick={startQuiz}>Let's Start!</button>
         </React.Fragment>
     );
 }
 
 function ParticipantList(props) {
+
     const participants = props.participants;
     const participantsInfo = [];
     for (const participant of participants) {
