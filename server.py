@@ -109,13 +109,13 @@ def yelphelper_session_setup():
         name = business.get("name")
         image_url = business.get("image_url")
         url = business.get("url")
-        review_count = int(business.get("review_count"))
-        yelp_rating = int(business.get("rating"))
+        review_count = business.get("review_count")
+        yelp_rating = business.get("rating")
         price = len(business.get("price"))
         address = business.get("location").get("display_address")
-        distance = int(business.get("distance"))
-        lat = int(business.get("coordinates").get("latitude"))
-        lng = int(business.get("coordinates").get("longitude"))
+        distance = business.get("distance")
+        lat = business.get("coordinates").get("latitude")
+        lng = business.get("coordinates").get("longitude")
         new_business = Business(alias=alias, name=name, image_url=image_url,
                                 url=url, review_count=review_count,
                                 yelp_rating=yelp_rating, price=price,
@@ -227,16 +227,39 @@ def show_result():
 
 @app.route('/results.json')
 def calculate_results():
+    yelphelper_session_id = session['yelphelper_session_id']
     ordered_total_scores = crud.get_ordered_total_scores(
-        session['yelphelper_session_id'])
+        yelphelper_session_id)
     total_scores = []
     for total_score in ordered_total_scores:
         b = Business.query.get(total_score.business_id)
         total_scores.append({"alias": b.alias, "name": b.name, "yelp_rating": b.yelp_rating,
                             "review_count": b.review_count, "image_url": b.image_url, "url": b.url, "total_score": total_score.total_score,
                              "lat": b.lat, "lng": b.lng})
-    print(total_scores)
-    return {"total_scores": total_scores}
+
+    users = crud.get_user_yelphelper_sessions(yelphelper_session_id)
+    users_locations = []
+    for user in users:
+        u = User.query.get(user.user_id)
+        users_locations.append(
+            {"fname": u.fname, "lat": user.lat, "lng": user.lng})
+
+    return {"total_scores": total_scores, "users_locations": users_locations}
+
+
+@app.route('/add-user-position', methods=['POST'])
+def add_user_position():
+    user_lat = request.form.get('lat')
+    user_lng = request.form.get('lng')
+    user_id = session['user_id']
+    yelphelper_session_id = session['yelphelper_session_id']
+    user_yelphelper_session = UserYelpHelperSession.query.filter(
+        UserYelpHelperSession.user_id == user_id, UserYelpHelperSession.yelphelper_session_id == yelphelper_session_id).first()
+    user_yelphelper_session.lat = user_lat
+    user_yelphelper_session.lng = user_lng
+    db.session.add(user_yelphelper_session)
+    db.session.commit()
+    return "user position has been added."
 
 
 if __name__ == '__main__':
