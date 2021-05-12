@@ -1,10 +1,12 @@
 function ResultsContainer(props) {
     const [businessesResults, setBusinessesResults] = React.useState([]);
+    const [usersLocations, setUsersLocations] = React.useState([]);
     const businessesInfo = [];
 
     React.useEffect(() => {
 		$.get('/results.json', (result) => {
 			setBusinessesResults(result.total_scores);
+            setUsersLocations(result.users_locations)
 		});
 	},[]);
 
@@ -20,7 +22,7 @@ function ResultsContainer(props) {
     return (
         <React.Fragment>
             <a href={'/'}>Return to Homepage</a>
-            <GoogleMap businesses = {businessesResults}/>
+            <GoogleMap businesses = {businessesResults} usersLocations = {usersLocations}/>
             <div>{businessesInfo}</div>
         </React.Fragment>
     )
