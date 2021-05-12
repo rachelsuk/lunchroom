@@ -162,6 +162,21 @@ def participants_data():
     return {"participants": participant_list, "logged_in": logged_in, "started": yelphelper_session.started}
 
 
+@app.route('/add-user-position', methods=['POST'])
+def add_user_position():
+    user_lat = request.form.get('lat')
+    user_lng = request.form.get('lng')
+    user_id = session['user_id']
+    yelphelper_session_id = session['yelphelper_session_id']
+    user_yelphelper_session = UserYelpHelperSession.query.filter(
+        UserYelpHelperSession.user_id == user_id, UserYelpHelperSession.yelphelper_session_id == yelphelper_session_id).first()
+    user_yelphelper_session.lat = user_lat
+    user_yelphelper_session.lng = user_lng
+    db.session.add(user_yelphelper_session)
+    db.session.commit()
+    return "user position has been added."
+
+
 @app.route('/quiz')
 def quiz():
     return render_template('quiz.html')
@@ -245,21 +260,6 @@ def calculate_results():
             {"fname": u.fname, "lat": user.lat, "lng": user.lng})
 
     return {"total_scores": total_scores, "users_locations": users_locations}
-
-
-@app.route('/add-user-position', methods=['POST'])
-def add_user_position():
-    user_lat = request.form.get('lat')
-    user_lng = request.form.get('lng')
-    user_id = session['user_id']
-    yelphelper_session_id = session['yelphelper_session_id']
-    user_yelphelper_session = UserYelpHelperSession.query.filter(
-        UserYelpHelperSession.user_id == user_id, UserYelpHelperSession.yelphelper_session_id == yelphelper_session_id).first()
-    user_yelphelper_session.lat = user_lat
-    user_yelphelper_session.lng = user_lng
-    db.session.add(user_yelphelper_session)
-    db.session.commit()
-    return "user position has been added."
 
 
 if __name__ == '__main__':
