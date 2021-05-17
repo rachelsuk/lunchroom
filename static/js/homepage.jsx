@@ -5,7 +5,7 @@ function Homepage(props) {
     return (
         <React.Fragment>
             <Header url={url}/>
-            <a href="/criteria-form">Start</a>
+            <a href="/start-session">Start</a>
         </React.Fragment>
     );
 }
