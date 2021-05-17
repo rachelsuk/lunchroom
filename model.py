@@ -30,8 +30,8 @@ class YelpHelperSession(db.Model):
     yelphelper_session_id = db.Column(
         db.Integer, autoincrement=True, primary_key=True)
     date = db.Column(db.Text, nullable=False)
-    location = db.Column(db.Text, nullable=False)
-    term = db.Column(db.Text, nullable=False)
+    location = db.Column(db.Text)
+    term = db.Column(db.Text)
     price = db.Column(db.Integer)
     started = db.Column(db.Boolean, default=False)
     completed = db.Column(db.Boolean, default=False)
@@ -55,6 +55,7 @@ class UserYelpHelperSession(db.Model):
     completed = db.Column(db.Boolean, default=False)
     lat = db.Column(db.Float)
     lng = db.Column(db.Float)
+    host = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<User {self.user_id} YelpHelper Session {self.yelphelper_session_id}>"
