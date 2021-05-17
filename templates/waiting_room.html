@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %} YelpHelper {% endblock %}
+
+{% block head %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <!-- defer - run at the very end. async - run the script in the background, don't block me (no guarantees about when its run) -->
+    <script
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBK2MfjfGqyN9RhjvbXtMK369AX5uKGTfw&libraries=map">
+  </script>
+{% endblock %}
+
+{% block body %}
+    <div id="root"></div>
+    <div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+
+
+    <script src="/static/js/components/map.jsx" type="text/jsx"></script>
+    <script src="/static/js/waitingRoom.jsx" type="text/jsx"></script>
+
+
+{% endblock %}
