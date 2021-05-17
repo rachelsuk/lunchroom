@@ -6,8 +6,10 @@ function ResultsContainer(props) {
     React.useEffect(() => {
 		$.get('/results.json', (result) => {
 			setBusinessesResults(result.total_scores);
-            setUsersLocations(result.users_locations)
 		});
+        $.get('/get-users-locations.json', (result) => {
+            setUsersLocations(result.users_locations);
+        });
 	},[]);
 
     for (const business of businessesResults) {
