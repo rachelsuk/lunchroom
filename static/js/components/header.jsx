@@ -18,8 +18,8 @@ function Header(props) {
     }
 
     return (
-        <React.Fragment>
+        <div>
            {loggedIn ? <button onClick={processLogOut}>Logout</button> : <button onClick={redirectLogIn}>Login</button>}
-        </React.Fragment>
+        </div>
         );
 }
