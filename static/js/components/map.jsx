@@ -73,7 +73,14 @@ function GoogleMap(props) {
                 userMarkers.push(new google.maps.Marker({
                     position: {lat: user.lat, lng: user.lng },
                     title: user.fname,
-                    map: googleMap
+                    map: googleMap,
+                    icon: {  // custom icon
+                        url: '/static/img/person-marker.png',
+                        scaledSize: {
+                          width: 30,
+                          height: 30
+                        }
+                    }
                 }));
             }
         }
@@ -102,7 +109,7 @@ function GoogleMap(props) {
         // auto center map to fit all business and user markers
         googleMap.fitBounds(bounds);
         googleMap.panToBounds(bounds);
-    });
+    },[businesses, usersLocations]);
 
    return (
        <div id="google-map" style={{ width: '800px', height: '600px' }} />
