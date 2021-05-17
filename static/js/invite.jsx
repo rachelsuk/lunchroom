@@ -2,86 +2,97 @@
 // https://web.dev/how-to-use-local-https/
 
 function Invite(props) {
-    const [participants, setParticipants] = React.useState([]);
-    const [loggedIn, setLoggedIn] = React.useState(false);
+    const [location, setLocation] = React.useState(false);
+    const [host, setHost] = React.useState(false);
 
     const url = window.location.href;
     
     React.useEffect(() => {
-        const interval = setInterval(() => {
-            $.get('/yelphelper-session-participants.json', (res) => {
-                setParticipants(res.participants);
-                if (res.logged_in) {
-                    setLoggedIn(true);
-                }
-                else {
-                    window.location.replace(`/login?url=${url}`);
-                }
-
-                if (res.started) {
-                    window.location.replace("/quiz");
-                }
-            });
-        }, 300);
-        return () => clearInterval(interval);
-    },[]);
-
-    function getLocation() {
-        if (navigator.geolocation) {
-            const currentPosition = navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    console.log(position);
-                  },
-                  function(error) {
-                    console.error("Error Code = " + error.code + " - " + error.message);
-                  }
-            );   
-        } else {
-            const currentPosition = {'coords': {'latitude': null, 'longitude': null}};
-        }
-
-        const positionData = {
-            'lat': currentPosition.coords.latitude,
-            'lng': currentPosition.coords.longitude
-        }
-
-        $.post('/add-user-position', positionData, (res) => {
-            console.log(res)
-        });
-    }
-
-    function startQuiz() {
-        $.post('/yelphelper-session-participants.json', (res) => {
-            if (res.started) {
-                window.location.replace("/quiz");
+        $.get('/check-login.json', (res) => {
+            if (!res.logged_in) {
+                window.location.replace(`/login?url=${url}`);
+            } else {
+                $.get('/check-host.json', (res) => {
+                    if (res.host) {
+                        setHost(true);
+                    }
+                });
             }
         });
-    }
+    },[]);
 
     return (
         <React.Fragment>
-            <ParticipantList participants={participants} />
-            <button onClick={getLocation}>Allow Access to My Location.</button>
-            <button onClick={startQuiz}>Let's Start!</button>
+            {host ? <div id="invite-link">Invite Link: {url}</div> : null}
+            {!location ? <UserLocationInput />: <div></div>}  
         </React.Fragment>
     );
 }
 
-function ParticipantList(props) {
-
-    const participants = props.participants;
-    const participantsInfo = [];
-    for (const participant of participants) {
-        participantsInfo.push(
-            <p key={`user${participant.user_id}`}>{participant.fname}</p>
-        );
+function UserLocationInput(props) {
+    function getExactCoords() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    console.log(position);
+                    const positionData = {
+                        'lat': position.coords.latitude,
+                        'lng': position.coords.longitude
+                    }
+            
+                    $.post('/add-user-location', positionData, (res) => {
+                        if (res.msg == "success") {
+                            setLocation(true);
+                        }
+                    });
+                  },
+                  function(error) {
+                    console.error("Error Code = " + error.code + " - " + error.message);
+                    const errorMsg = document.querySelector('#error-msg');
+                    errorMsg.innerHTML = 'Could not get location. Please provide zipcode instead.'
+                  }
+            );   
+        } else {
+            const errorMsg = document.querySelector('#error-msg');
+            errorMsg.innerHTML = 'Could not get location. Please provide zipcode instead.'
+        }        
     }
+
+    function getZipCodeCoords() {
+        const zipCodeInput = document.querySelector('input[name="zipcode"]');
+        const zipCodeData = {'zipcode': zipCodeInput}
+        if (zipCodeInput.length == 5) {
+            $.get('/find-zipcode-coords.json', zipCodeData, (res) => {
+                const positionData = {
+                    'lat': res.coords.lat,
+                    'lng': res.coords.lng
+                }
+                $.post('/add-user-location', positionData, (res) => {
+                    if (res.msg == "success") {
+                        setLocation(true);
+                    }
+                });
+            })
+        } else {
+            errorMsg.innerHTML = 'Not a valid zipcode - must be 5 integers long.'
+        }
+
+    }
+
     return (
-        <div>
-            {participantsInfo}
-        </div>
-    );
-    
+    <div id="user-location-form">
+        <div className="error-msg"></div> 
+        <button onClick={getExactCoords}>Allow Access to My Exact Location.</button>
+        OR
+        <form onSubmit={getZipCodeCoords}>
+            <label>Zipcode: </label>
+            <input type="text" name="zipcode" />
+            <input type="submit" />
+        </form>
+    </div>
+
+    )
+
 }
 
 ReactDOM.render(
