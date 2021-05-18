@@ -3,7 +3,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import model
 import crud
-from model import db, User, YelpHelperSession, UserYelpHelperSession, Business, Score
+from model import db, User, YelpHelperSession, UserYelpHelperSession, Business, Score, SearchCriteria
 import yelp_api
 import geocoding_api
 from datetime import datetime
@@ -82,6 +82,7 @@ def process_logout():
 def start_session():
     """Start a yelphelper session."""
     date = datetime.today()
+    # create yelphelper session
     yelphelper_session = YelpHelperSession(date=date)
     db.session.add(yelphelper_session)
     db.session.commit()
@@ -102,10 +103,10 @@ def invite(yelphelper_session_id):
                 yelphelper_session_id=session['yelphelper_session_id']).first()
             if not host_exists:
                 user_yelphelper_session = UserYelpHelperSession(
-                    user_id=user_id, yelphelper_session_id=yelphelper_session.yelphelper_session_id, host=True)
+                    user_id=user_id, yelphelper_session_id=session['yelphelper_session_id'], is_host=True)
             else:
                 user_yelphelper_session = UserYelpHelperSession(
-                    user_id=user_id, yelphelper_session_id=yelphelper_session.yelphelper_session_id)
+                    user_id=user_id, yelphelper_session_id=session['yelphelper_session_id'])
             db.session.add(user_yelphelper_session)
             db.session.commit()
     return render_template('invite.html')
@@ -117,8 +118,8 @@ def check_host():
     user_id = session['user_id']
     user_yelphelper_session = UserYelpHelperSession.query.filter_by(
         user_id=user_id, yelphelper_session_id=yelphelper_session_id).first()
-    host = user_yelphelper_session.host
-    return {'host': host}
+    is_host = user_yelphelper_session.is_host
+    return {'is_host': is_host}
 
 
 @app.route('/add-user-location', methods=['POST'])
@@ -136,62 +137,104 @@ def add_user_location():
     return {"msg": "success"}
 
 
-@app.route('/find-zipcode-coords')
+@app.route('/find-zipcode-coords.json')
 def find_zipcode_coords():
     zipcode = request.args.get('zipcode')
     coords = geocoding_api.get_zipcode_coords(zipcode)
     return {"coords": coords}
 
 
-@app.route('/criteria-form')
-def form():
-    return render_template('criteria_form.html')
-
-
-@app.route('/yelphelpersession-setup', methods=["POST"])
-def yelphelper_session_setup():
-    """Set up a yelphelper session"""
+@app.route('/add-search-criteria.json', methods=['POST'])
+def add_search_criteria():
+    yelphelper_session_id = session['yelphelper_session_id']
+    user_id = session['user_id']
 
     # pull form data from POST request
-
     search_term = request.form.get("search_term")
-    location = request.form.get("location")
-    price = int(request.form.get("price"))
+    price = request.form.get("price")
 
-    # create YelpHelperSession object using form data and save to database
-    yelphelper_session = YelpHelperSession(date=date, location=location, term=search_term,
-                                           price=price)
-    db.session.add(yelphelper_session)
+    # create SearchCriteria object using form data and save to database
+    search_criteria = SearchCriteria(
+        yelphelper_session_id=yelphelper_session_id, user_id=user_id, term=search_term, price=price)
+    db.session.add(search_criteria)
     db.session.commit()
 
-    # connect to yelp API and get 10 restaurants that fit form data criteria
-    businesses = yelp_api.business_search(
-        location, search_term, price)
+    return {"msg": "success"}
 
-    # loop through each restaurant
-    for business in businesses:
-        # pull business data from json and save to database
-        alias = business.get("alias")
-        name = business.get("name")
-        image_url = business.get("image_url")
-        url = business.get("url")
-        review_count = business.get("review_count")
-        yelp_rating = business.get("rating")
-        price = len(business.get("price"))
-        address = business.get("location").get("display_address")
-        distance = business.get("distance")
-        lat = business.get("coordinates").get("latitude")
-        lng = business.get("coordinates").get("longitude")
-        new_business = Business(alias=alias, name=name, image_url=image_url,
-                                url=url, review_count=review_count,
-                                yelp_rating=yelp_rating, price=price,
-                                address=address, distance=distance,
-                                lat=lat, lng=lng,
-                                yelphelper_session_id=yelphelper_session.yelphelper_session_id)
-        db.session.add(new_business)
-    db.session.commit()
 
-    return redirect(f'/invite/{yelphelper_session.yelphelper_session_id}')
+@app.route('/waiting-room')
+def waiting_room():
+    return render_template('waiting_room.html')
+
+
+@app.route('/start-quiz.json', methods=['GET', 'POST'])
+def start_quiz():
+    yelphelper_session_id = session['yelphelper_session_id']
+    yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
+    if request.method == 'POST':
+        yelphelper_session.started = True
+        db.session.add(yelphelper_session)
+        db.session.commit()
+    return {"started": yelphelper_session.started}
+
+
+@app.route('/get-users-locations.json')
+def get_users_locations():
+    yelphelper_session_id = session['yelphelper_session_id']
+    users = crud.get_user_yelphelper_sessions(yelphelper_session_id)
+    users_locations = []
+    for user in users:
+        u = User.query.get(user.user_id)
+        users_locations.append(
+            {"fname": u.fname, "lat": user.lat, "lng": user.lng})
+
+    return {"users_locations": users_locations}
+
+
+# @app.route('/yelphelpersession-setup', methods=["POST"])
+# def yelphelper_session_setup():
+#     """Set up a yelphelper session"""
+
+#     # pull form data from POST request
+
+#     search_term = request.form.get("search_term")
+#     location = request.form.get("location")
+#     price = int(request.form.get("price"))
+
+#     # create YelpHelperSession object using form data and save to database
+#     yelphelper_session = YelpHelperSession(date=date, location=location, term=search_term,
+#                                            price=price)
+#     db.session.add(yelphelper_session)
+#     db.session.commit()
+
+#     # connect to yelp API and get 10 restaurants that fit form data criteria
+#     businesses = yelp_api.business_search(
+#         location, search_term, price)
+
+#     # loop through each restaurant
+#     for business in businesses:
+#         # pull business data from json and save to database
+#         alias = business.get("alias")
+#         name = business.get("name")
+#         image_url = business.get("image_url")
+#         url = business.get("url")
+#         review_count = business.get("review_count")
+#         yelp_rating = business.get("rating")
+#         price = len(business.get("price"))
+#         address = business.get("location").get("display_address")
+#         distance = business.get("distance")
+#         lat = business.get("coordinates").get("latitude")
+#         lng = business.get("coordinates").get("longitude")
+#         new_business = Business(alias=alias, name=name, image_url=image_url,
+#                                 url=url, review_count=review_count,
+#                                 yelp_rating=yelp_rating, price=price,
+#                                 address=address, distance=distance,
+#                                 lat=lat, lng=lng,
+#                                 yelphelper_session_id=yelphelper_session.yelphelper_session_id)
+#         db.session.add(new_business)
+#     db.session.commit()
+
+#     return redirect(f'/invite/{yelphelper_session.yelphelper_session_id}')
 
 
 @app.route('/yelphelper-session-participants.json', methods=['GET', 'POST'])
@@ -311,19 +354,6 @@ def calculate_results():
     #         {"fname": u.fname, "lat": user.lat, "lng": user.lng})
 
     return {"total_scores": total_scores}
-
-
-@app.route('/get-users-locations.json')
-def get_users_locations():
-    yelphelper_session_id = session['yelphelper_session_id']
-    users = crud.get_user_yelphelper_sessions(yelphelper_session_id)
-    users_locations = []
-    for user in users:
-        u = User.query.get(user.user_id)
-        users_locations.append(
-            {"fname": u.fname, "lat": user.lat, "lng": user.lng})
-
-    return {"users_locations": users_locations}
 
 
 if __name__ == '__main__':
