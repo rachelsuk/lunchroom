@@ -30,9 +30,6 @@ class YelpHelperSession(db.Model):
     yelphelper_session_id = db.Column(
         db.Integer, autoincrement=True, primary_key=True)
     date = db.Column(db.Text, nullable=False)
-    location = db.Column(db.Text)
-    term = db.Column(db.Text)
-    price = db.Column(db.Integer)
     started = db.Column(db.Boolean, default=False)
     completed = db.Column(db.Boolean, default=False)
 
@@ -42,6 +39,24 @@ class YelpHelperSession(db.Model):
 
     def __repr__(self):
         return f"<YelpHelper Session {self.date}>"
+
+
+class SearchCriteria(db.Model):
+    __tablename__ = 'search_criterias'
+
+    search_criteria_id = db.Column(
+        db.Integer, autoincrement=True, primary_key=True)
+    yelphelper_session_id = db.Column(db.Integer, db.ForeignKey(
+        'yelphelper_sessions.yelphelper_session_id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    term = db.Column(db.Text)
+    price = db.Column(db.Integer)
+
+    yelphelper_session = db.relationship(
+        'YelpHelperSession', backref='search_criterias')
+
+    def __repr__(self):
+        return f"<Search Critera '{self.term}' for yelphelper session {self.yelphelper_session_id}>"
 
 
 class UserYelpHelperSession(db.Model):
@@ -55,7 +70,7 @@ class UserYelpHelperSession(db.Model):
     completed = db.Column(db.Boolean, default=False)
     lat = db.Column(db.Float)
     lng = db.Column(db.Float)
-    host = db.Column(db.Boolean, default=False)
+    is_host = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<User {self.user_id} YelpHelper Session {self.yelphelper_session_id}>"
