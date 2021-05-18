@@ -1,61 +1,51 @@
 // https://www.w3schools.com/html/html5_geolocation.asp
 // https://web.dev/how-to-use-local-https/
+// https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 
 function WaitingRoom(props) {
-    const [participants, setParticipants] = React.useState([]);
-    const [loggedIn, setLoggedIn] = React.useState(false);
-    const [location, setLocation] = React.useState(false);
+    const [isHost, setIsHost] = React.useState(false);
     const [usersLocations, setUsersLocations] = React.useState([]);
+    const savedCallback = React.useRef();
 
-    const url = window.location.href;
-    
+    function callback(users_locations) {
+        // why users_locations != usersLocations doesn't work?
+        if (users_locations.length != usersLocations.length) {
+            console.log(users_locations)
+            console.log(usersLocations)
+            console.log(users_locations.length === usersLocations.length)
+            setUsersLocations(users_locations);
+            console.log(usersLocations)
+        }
+    }
+
     React.useEffect(() => {
+        savedCallback.current = callback;
+    })
+
+    React.useEffect(() => {
+        $.get('/check-host.json', (res) => {
+            if (res.is_host) {
+                setIsHost(true);
+            }
+        });
         const interval = setInterval(() => {
-            $.get('/yelphelper-session-participants.json', (res) => {
+            $.get('/start-quiz.json', (res) => {
                 if (res.started) {
                     window.location.replace("/quiz");
-                } else if (!res.logged_in) {
-                    window.location.replace(`/login?url=${url}`);
-                } else if (res.participants != participants) {
-                    setParticipants(res.participants);
                 }
             });
             $.get('/get-users-locations.json', (result) => {
-                if (result.users_locations != usersLocations) {
-                    setUsersLocations(result.users_locations);
-                }
+
+                savedCallback.current(result.users_locations);
             });
-        }, 300);
+        }, 5000);
         return () => clearInterval(interval);
-    },[]);
-
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    console.log(position);
-                    const positionData = {
-                        'lat': position.coords.latitude,
-                        'lng': position.coords.longitude
-                    }
-            
-                    $.post('/add-user-location', positionData, (res) => {
-                        setLocation(true);
-                    });
-                  },
-                  function(error) {
-                    console.error("Error Code = " + error.code + " - " + error.message);
-                  }
-            );   
-        } else {
-            const currentPosition = {'coords': {'latitude': null, 'longitude': null}};
-        }
-
-        
-    }
+    }, []);
 
     function startQuiz() {
-        $.post('/yelphelper-session-participants.json', (res) => {
+        // check that distance makes sense
+        // add businesses from yelp api
+        $.post('/start-quiz.json', (res) => {
             if (res.started) {
                 window.location.replace("/quiz");
             }
@@ -64,30 +54,28 @@ function WaitingRoom(props) {
 
     return (
         <React.Fragment>
-            <ParticipantList participants={participants} />
-            {location ? <div>Your location has been added.</div>: <button onClick={getLocation}>Allow Access to My Location.</button>}
             <button onClick={startQuiz}>Let's Start!</button>
-            <GoogleMap usersLocations = {usersLocations} businesses={[]}/>
+            <GoogleMap usersLocations={usersLocations} businesses={[]} />
         </React.Fragment>
     );
 }
 
-function ParticipantList(props) {
+// function ParticipantList(props) {
 
-    const participants = props.participants;
-    const participantsInfo = [];
-    for (const participant of participants) {
-        participantsInfo.push(
-            <p key={`user${participant.user_id}`}>{participant.fname}</p>
-        );
-    }
-    return (
-        <div>
-            {participantsInfo}
-        </div>
-    );
-    
-}
+//     const participants = props.participants;
+//     const participantsInfo = [];
+//     for (const participant of participants) {
+//         participantsInfo.push(
+//             <p key={`user${participant.user_id}`}>{participant.fname}</p>
+//         );
+//     }
+//     return (
+//         <div>
+//             {participantsInfo}
+//         </div>
+//     );
+
+// }
 
 ReactDOM.render(
     <WaitingRoom />,
