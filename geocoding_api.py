@@ -8,9 +8,11 @@ def get_zipcode_coords(zipcode):
                "key": "AIzaSyBK2MfjfGqyN9RhjvbXtMK369AX5uKGTfw"}
 
     response = requests.request(
-        "GET", url, params=payload)
+        "GET", url, params=payload).json()
 
-    lat = response.get("results").get("geometry").get("location").get("lat")
-    lng = response.get("results").get("geometry").get("location").get("lng")
+    result = response.get("results")
+
+    lat = result[0].get("geometry").get("location").get("lat")
+    lng = result[0].get("geometry").get("location").get("lng")
 
     return {"lat": lat, "lng": lng}
