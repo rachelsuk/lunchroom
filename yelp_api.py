@@ -4,11 +4,11 @@ import os
 YELP_KEY = os.environ['YELP_KEY']
 
 
-def business_search(location, search_term, price=None, min_rating=None):
+def business_search(lat, lng, search_term, price=None, min_rating=None):
     url = 'https://api.yelp.com/v3/businesses/search'
     # Use form data from the user to populate any search parameters
     headers = {'Authorization': 'Bearer %s' % YELP_KEY}
-    payload = {'term': search_term, 'location': location,
+    payload = {'term': search_term, 'latitude': lat, 'longitude': lng,
                'price': price}
     # Make a request to the Event Search endpoint to search for events
     res = requests.get(url, params=payload, headers=headers)
