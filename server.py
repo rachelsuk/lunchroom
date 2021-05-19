@@ -6,6 +6,7 @@ import crud
 from model import db, User, YelpHelperSession, UserYelpHelperSession, Business, Score, SearchCriteria
 import yelp_api
 import geocoding_api
+import distance_matrix_api
 from datetime import datetime
 import os
 
@@ -178,97 +179,88 @@ def start_quiz():
     return {"started": yelphelper_session.started}
 
 
-@app.route('/get-users-locations.json')
-def get_users_locations():
+@app.route('/retrieve-users-locations.json')
+def retrieve_users_locations():
     yelphelper_session_id = session['yelphelper_session_id']
-    users = crud.get_user_yelphelper_sessions(yelphelper_session_id)
-    users_locations = []
-    for user in users:
-        u = User.query.get(user.user_id)
-        users_locations.append(
-            {"fname": u.fname, "lat": user.lat, "lng": user.lng})
+    users_locations = crud.get_users_locations(yelphelper_session_id)
 
     return {"users_locations": users_locations}
 
 
-# @app.route('/yelphelpersession-setup', methods=["POST"])
-# def yelphelper_session_setup():
-#     """Set up a yelphelper session"""
-
-#     # pull form data from POST request
-
-#     search_term = request.form.get("search_term")
-#     location = request.form.get("location")
-#     price = int(request.form.get("price"))
-
-#     # create YelpHelperSession object using form data and save to database
-#     yelphelper_session = YelpHelperSession(date=date, location=location, term=search_term,
-#                                            price=price)
-#     db.session.add(yelphelper_session)
-#     db.session.commit()
-
-#     # connect to yelp API and get 10 restaurants that fit form data criteria
-#     businesses = yelp_api.business_search(
-#         location, search_term, price)
-
-#     # loop through each restaurant
-#     for business in businesses:
-#         # pull business data from json and save to database
-#         alias = business.get("alias")
-#         name = business.get("name")
-#         image_url = business.get("image_url")
-#         url = business.get("url")
-#         review_count = business.get("review_count")
-#         yelp_rating = business.get("rating")
-#         price = len(business.get("price"))
-#         address = business.get("location").get("display_address")
-#         distance = business.get("distance")
-#         lat = business.get("coordinates").get("latitude")
-#         lng = business.get("coordinates").get("longitude")
-#         new_business = Business(alias=alias, name=name, image_url=image_url,
-#                                 url=url, review_count=review_count,
-#                                 yelp_rating=yelp_rating, price=price,
-#                                 address=address, distance=distance,
-#                                 lat=lat, lng=lng,
-#                                 yelphelper_session_id=yelphelper_session.yelphelper_session_id)
-#         db.session.add(new_business)
-#     db.session.commit()
-
-#     return redirect(f'/invite/{yelphelper_session.yelphelper_session_id}')
-
-
-@app.route('/yelphelper-session-participants.json', methods=['GET', 'POST'])
-def participants_data():
-    yelphelper_session_id = int(session['yelphelper_session_id'])
+@app.route('/check-distance.json')
+def check_distance():
+    yelphelper_session_id = session['yelphelper_session_id']
     yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
-    logged_in = False
-    if 'user_id' in session:
-        logged_in = True
-        # add user to YelpHelperSession by creating UserYelpHelperSession object (middle table)
-        user_id = session['user_id']
-        user_yelphelper_session = UserYelpHelperSession.query.filter_by(
-            user_id=user_id, yelphelper_session_id=session['yelphelper_session_id']).first()
-        if not user_yelphelper_session:
-            user_yelphelper_session = UserYelpHelperSession(
-                user_id=user_id, yelphelper_session_id=yelphelper_session.yelphelper_session_id)
-            db.session.add(user_yelphelper_session)
-            db.session.commit()
-    # users = crud.get_user_yelphelper_sessions(yelphelper_session_id)
-    # users_list = []
-    # for user in users:
-    #     u = User.query.get(user.user_id)
-    #     users_list.append(
-    #         {"user_id": u.user_id, "fname": u.fname, "lat": user.lat, "lng": user.lng})
-    participants = yelphelper_session.users
-    participant_list = []
-    for p in participants:
-        participant_list.append(
-            {"user_id": p.user_id, "fname": p.fname})
-    if request.method == 'POST':
-        yelphelper_session.started = True
+    max_distance = float(request.args.get('max-distance'))
+
+    users_locations = crud.get_users_locations(yelphelper_session_id)
+    response = distance_matrix_api.check_distance(
+        users_locations, max_distance)
+    if response["msg"] == "success":
+        yelphelper_session.max_distance = max_distance
         db.session.add(yelphelper_session)
         db.session.commit()
-    return {"participants": participant_list, "logged_in": logged_in, "started": yelphelper_session.started}
+
+    return response
+
+
+@app.route('/retrieve-businesses.json', methods=['POST'])
+def retrieve_businesses():
+    yelphelper_session_id = session['yelphelper_session_id']
+    yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
+    users_locations = crud.get_users_locations(yelphelper_session_id)
+    max_distance = yelphelper_session.max_distance
+    search_criterias = yelphelper_session.search_criterias
+    yelp_api_responses = {}
+    for search_criteria in search_criterias:
+        user_yelphelper_session = UserYelpHelperSession.query.filter_by(
+            user_id=search_criteria.user_id, yelphelper_session_id=yelphelper_session_id).first()
+        lat = user_yelphelper_session.lat
+        lng = user_yelphelper_session.lng
+
+        businesses = yelp_api.business_search(
+            lat, lng, search_criteria.term, search_criteria.price)
+        businesses_locations = []
+        for business in businesses:
+            businesses_locations.append({"lat": business.get("coordinates").get(
+                "latitude"), "lng": business.get("coordinates").get("longitude")})
+        indices_to_remove = distance_matrix_api.check_below_max_distance(
+            users_locations, businesses_locations, max_distance)
+        for index in indices_to_remove:
+            del businesses[index]
+        yelp_api_responses[search_criteria.search_criteria_id] = businesses
+        print(yelp_api_responses)
+
+    businesses_count = 0
+    index = 0
+    while businesses_count < 10:
+        for api_response in yelp_api_responses.values():
+            print(index)
+            business = api_response[index]
+            alias = business.get("alias")
+            name = business.get("name")
+            image_url = business.get("image_url")
+            url = business.get("url")
+            review_count = business.get("review_count")
+            yelp_rating = business.get("rating")
+            price = len(business.get("price"))
+            address = business.get("location").get("display_address")
+            lat = business.get("coordinates").get("latitude")
+            lng = business.get("coordinates").get("longitude")
+            new_business = Business(alias=alias, name=name, image_url=image_url,
+                                    url=url, review_count=review_count,
+                                    yelp_rating=yelp_rating, price=price,
+                                    address=address,
+                                    lat=lat, lng=lng,
+                                    yelphelper_session_id=yelphelper_session_id)
+            db.session.add(new_business)
+            db.session.commit()
+            businesses_count += 1
+            if businesses_count == 10:
+                break
+            print(businesses_count)
+        index += 1
+    return {'msg': 'success'}
 
 
 @app.route('/quiz')
@@ -283,7 +275,9 @@ def businesses_data():
     businesses_list = []
     for b in yelphelper_session_businesses:
         businesses_list.append(
-            {"alias": b.alias, "name": b.name, "yelp_rating": b.yelp_rating, "review_count": b.review_count, "image_url": b.image_url, "url": b.url})
+            {"alias": b.alias, "name": b.name, "yelp_rating": b.yelp_rating,
+             "review_count": b.review_count, "image_url": b.image_url, "url": b.url,
+             "lat": b.lat, "lng": b.lng})
     return {"businesses": businesses_list}
 
 
@@ -345,13 +339,6 @@ def calculate_results():
         total_scores.append({"alias": b.alias, "name": b.name, "yelp_rating": b.yelp_rating,
                             "review_count": b.review_count, "image_url": b.image_url, "url": b.url, "total_score": total_score.total_score,
                              "lat": b.lat, "lng": b.lng})
-
-    # users = crud.get_user_yelphelper_sessions(yelphelper_session_id)
-    # users_locations = []
-    # for user in users:
-    #     u = User.query.get(user.user_id)
-    #     users_locations.append(
-    #         {"fname": u.fname, "lat": user.lat, "lng": user.lng})
 
     return {"total_scores": total_scores}
 
