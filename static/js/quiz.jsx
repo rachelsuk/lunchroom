@@ -2,6 +2,7 @@ function QuizContainer(props) {
     const [businesses, setBusinesses] = React.useState([]);
     const [businessIndex, setBusinessIndex] = React.useState(0);
     const [allBusinessesScored, setAllBusinessesScored] = React.useState(false);
+    const [usersLocations, setUsersLocations] = React.useState([]);
 
     // QUESTION: is the useEffect running each time businessIndex is updated? If so, is 
     // there a better way to do this since i really only need to fetch the businesses data once?
@@ -14,13 +15,18 @@ function QuizContainer(props) {
 
         getBusinesses();
 
+        $.get('/retrieve-users-locations.json', (result) => {
+            setUsersLocations(result.users_locations);
+        });
+
         const interval = setInterval(() => {
             $.post('/check-all-completed', (res) => {
                 if (res.all_completed) {
-                    window.location.replace("/result");  
+                    window.location.replace("/result");
                 }
             });
         }, 1000);
+
     }, [])
 
     // Fetch Businesses
@@ -45,7 +51,7 @@ function QuizContainer(props) {
             }
             else {
                 setAllBusinessesScored(true);
-                fetch('/user-completed', {method: 'POST'});
+                fetch('/user-completed', { method: 'POST' });
             }
         });
 
@@ -54,7 +60,7 @@ function QuizContainer(props) {
     return (
         <React.Fragment>
             {(businesses.length && !allBusinessesScored) > 0 ? <Quiz business=
-            {businesses[businessIndex]} submitHandler={submitHandler}/> : null}
+                {businesses[businessIndex]} usersLocations={usersLocations} submitHandler={submitHandler} /> : null}
             {allBusinessesScored ? <Wait /> : null}
         </React.Fragment>
     );
@@ -62,11 +68,12 @@ function QuizContainer(props) {
 
 function Quiz(props) {
     const business = props.business;
+    const usersLocations = props.usersLocations;
 
     return (
         <React.Fragment>
             <div id='business-quiz'>
-                <Business business={business}/>
+                <Business business={business} />
                 <form id='business-score' onSubmit={props.submitHandler}>
                     <select name="business_score">
                         <option value="0">Absolutely not</option>
@@ -74,9 +81,10 @@ function Quiz(props) {
                         <option value="3">Looks Good!</option>
                         <option value="5">This is the place for sure!!!</option>
                     </select>
-                    <input type='submit'/>
+                    <input type='submit' />
                 </form>
             </div>
+            <GoogleMap businesses={[business]} usersLocations={usersLocations} />
         </React.Fragment>
     )
 }
