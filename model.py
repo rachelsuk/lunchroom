@@ -32,6 +32,7 @@ class YelpHelperSession(db.Model):
     date = db.Column(db.Text, nullable=False)
     started = db.Column(db.Boolean, default=False)
     completed = db.Column(db.Boolean, default=False)
+    max_distance = db.Column(db.Float)
 
     users = db.relationship("User",
                             secondary="users_yelphelper_sessions",
@@ -88,7 +89,6 @@ class Business(db.Model):
     yelp_rating = db.Column(db.Integer)
     price = db.Column(db.Integer)
     address = db.Column(db.Text)
-    distance = db.Column(db.Integer)
     lat = db.Column(db.Float)
     lng = db.Column(db.Float)
     yelphelper_session_id = db.Column(db.Integer, db.ForeignKey(
@@ -124,7 +124,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///yelphelper'
-    app.config["SQLALCHEMY_ECHO"] = True
+    app.config["SQLALCHEMY_ECHO"] = False
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
