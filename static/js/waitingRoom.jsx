@@ -5,6 +5,8 @@
 function WaitingRoom(props) {
     const [isHost, setIsHost] = React.useState(false);
     const [usersLocations, setUsersLocations] = React.useState([]);
+    const [errorMessage, setErrorMessage] = React.useState(null);
+    const [started, setStarted] = React.useState(false);
     const savedCallback = React.useRef();
 
     function callback(users_locations) {
@@ -12,7 +14,8 @@ function WaitingRoom(props) {
         if (users_locations.length != usersLocations.length) {
             console.log(users_locations)
             console.log(usersLocations)
-            console.log(users_locations.length === usersLocations.length)
+            // console.log(users_locations.length === usersLocations.length)
+            console.log(typeof (users_locations[0]) === typeof (usersLocations[0]))
             setUsersLocations(users_locations);
             console.log(usersLocations)
         }
@@ -34,7 +37,9 @@ function WaitingRoom(props) {
                     window.location.replace("/quiz");
                 }
             });
-            $.get('/get-users-locations.json', (result) => {
+            $.get('/retrieve-users-locations.json', (result) => {
+                console.log(result.users_locations)
+                console.log(usersLocations)
 
                 savedCallback.current(result.users_locations);
             });
@@ -43,18 +48,44 @@ function WaitingRoom(props) {
     }, []);
 
     function startQuiz() {
-        // check that distance makes sense
-        // add businesses from yelp api
-        $.post('/start-quiz.json', (res) => {
-            if (res.started) {
-                window.location.replace("/quiz");
+        setStarted(true);
+    }
+
+    function checkDistance(evt) {
+        evt.preventDefault();
+
+        const distanceData = $('#max-distance-form').serialize();
+
+        $.get('/check-distance.json', distanceData, (res) => {
+            if (res.msg == "success") {
+                setErrorMessage("Maximum distance has been accepted!");
+                $.post('/retrieve-businesses.json', (res) => {
+                    if (res.msg == 'success') {
+                        $.post('/start-quiz.json', (res) => {
+                            if (res.started) {
+                                window.location.replace("/quiz");
+                            }
+                        });
+                    }
+
+                })
+
+            } else if (res.msg == "fail") {
+                setErrorMessage(`Invalid maximum distance. Maximum distance must at least ${res.min_max_distance} miles.`)
             }
         });
+
     }
 
     return (
         <React.Fragment>
-            <button onClick={startQuiz}>Let's Start!</button>
+            {isHost && !started ? <button onClick={startQuiz}>Let's Start!</button> : null}
+            {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
+            {started ? (<form onSubmit={checkDistance} id="max-distance-form">
+                <label>Maximum Distance: </label>
+                <input type="text" name="max-distance" id="max-distance-field" />
+                <input type="submit" />
+            </form>) : null}
             <GoogleMap usersLocations={usersLocations} businesses={[]} />
         </React.Fragment>
     );
