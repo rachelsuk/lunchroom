@@ -163,9 +163,9 @@ def add_search_criteria():
     return {"msg": "success"}
 
 
-@app.route('/waiting-room')
-def waiting_room():
-    return render_template('waiting_room.html')
+@app.route('/waiting-room-start')
+def waiting_room_start():
+    return render_template('waiting_room_start.html')
 
 
 @app.route('/start-quiz.json', methods=['GET', 'POST'])
@@ -209,58 +209,74 @@ def retrieve_businesses():
     yelphelper_session_id = session['yelphelper_session_id']
     yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
     users_locations = crud.get_users_locations(yelphelper_session_id)
+    center_point = distance_matrix_api.find_center_point(users_locations)
+    print(
+        f'center point: {center_point.get("lat")}, {center_point.get("lng")}')
     max_distance = yelphelper_session.max_distance
     search_criterias = yelphelper_session.search_criterias
     yelp_api_responses = {}
+    longest_list = 0
     for search_criteria in search_criterias:
-        user_yelphelper_session = UserYelpHelperSession.query.filter_by(
-            user_id=search_criteria.user_id, yelphelper_session_id=yelphelper_session_id).first()
-        lat = user_yelphelper_session.lat
-        lng = user_yelphelper_session.lng
-
         businesses = yelp_api.business_search(
-            lat, lng, search_criteria.term, search_criteria.price)
+            center_point.get("lat"), center_point.get("lng"), search_criteria.term, search_criteria.price)
         businesses_locations = []
         for business in businesses:
             businesses_locations.append({"lat": business.get("coordinates").get(
                 "latitude"), "lng": business.get("coordinates").get("longitude")})
         indices_to_remove = distance_matrix_api.check_below_max_distance(
             users_locations, businesses_locations, max_distance)
-        for index in indices_to_remove:
+        for index in sorted(list(indices_to_remove), reverse=True):
             del businesses[index]
         yelp_api_responses[search_criteria.search_criteria_id] = businesses
+        if len(businesses) > longest_list:
+            longest_list = len(businesses)
         print(yelp_api_responses)
 
-    businesses_count = 0
+    existing_businesses_count = len(yelphelper_session.businesses)
+    businesses_left = 10 - existing_businesses_count
     index = 0
-    while businesses_count < 10:
+    msg = "success"
+    print(f'starting business count: {businesses_left}')
+    print(yelphelper_session.businesses)
+    while businesses_left > 0:
         for api_response in yelp_api_responses.values():
-            print(index)
-            business = api_response[index]
-            alias = business.get("alias")
-            name = business.get("name")
-            image_url = business.get("image_url")
-            url = business.get("url")
-            review_count = business.get("review_count")
-            yelp_rating = business.get("rating")
-            price = len(business.get("price"))
-            address = business.get("location").get("display_address")
-            lat = business.get("coordinates").get("latitude")
-            lng = business.get("coordinates").get("longitude")
-            new_business = Business(alias=alias, name=name, image_url=image_url,
-                                    url=url, review_count=review_count,
-                                    yelp_rating=yelp_rating, price=price,
-                                    address=address,
-                                    lat=lat, lng=lng,
-                                    yelphelper_session_id=yelphelper_session_id)
-            db.session.add(new_business)
-            db.session.commit()
-            businesses_count += 1
-            if businesses_count == 10:
+            try:
+                print(api_response)
+                print(f'index {index}')
+                business = api_response[index]
+                alias = business.get("alias")
+                business_already_added = db.session.query(Business).filter_by(
+                    yelphelper_session=yelphelper_session, alias=alias).first()
+                if not business_already_added:
+                    name = business.get("name")
+                    image_url = business.get("image_url")
+                    url = business.get("url")
+                    review_count = business.get("review_count")
+                    yelp_rating = business.get("rating")
+                    price = len(business.get("price"))
+                    address = business.get("location").get("display_address")
+                    lat = business.get("coordinates").get("latitude")
+                    lng = business.get("coordinates").get("longitude")
+                    new_business = Business(alias=alias, name=name, image_url=image_url,
+                                            url=url, review_count=review_count,
+                                            yelp_rating=yelp_rating, price=price,
+                                            address=address,
+                                            lat=lat, lng=lng,
+                                            yelphelper_session_id=yelphelper_session_id)
+                    db.session.add(new_business)
+                    db.session.commit()
+                    businesses_left -= 1
+            except IndexError:
+                pass
+            if businesses_left <= 0:
                 break
-            print(businesses_count)
+            print(f'business count: {businesses_left}')
         index += 1
-    return {'msg': 'success'}
+        if index >= longest_list:
+            msg = "fail"
+            businesses_left = 0
+
+    return {'msg': msg}
 
 
 @app.route('/quiz')
@@ -293,6 +309,11 @@ def save_score():
     db.session.add(new_score)
     db.session.commit()
     return "score has been added."
+
+
+@app.route('/waiting-room-end')
+def waiting_room_end():
+    return render_template('waiting_room_end.html')
 
 
 @app.route('/user-completed', methods=['POST'])
