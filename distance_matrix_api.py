@@ -1,4 +1,5 @@
 import requests
+from math import pi, cos, sin, atan2, sqrt
 
 
 def return_distances(origins, destinations):
@@ -34,7 +35,6 @@ def create_locations_string(locations):
 def check_distance(users_locations, max_distance):
     response = return_distances(users_locations, users_locations)
     rows = response.get("rows")
-    print(rows)
 
     msg = "success"
 
@@ -55,18 +55,43 @@ def check_distance(users_locations, max_distance):
 
 
 def check_below_max_distance(users_locations, businesses_locations, max_distance):
-    response = return_distances(users_locations, users_locations)
+    response = return_distances(users_locations, businesses_locations)
     rows = response.get("rows")
-    indices_to_remove = []
+    indices_to_remove = set()
     for row in rows:
         elements = row.get("elements")
         for index, element in enumerate(elements):
             meters = element.get("distance").get("value")
             miles = convert_meters_to_miles(meters)
             if max_distance < miles:
-                indices_to_remove.append(index)
+                print(f'{miles} miles. deleting index {index}')
+                indices_to_remove.add(index)
+
     return indices_to_remove
 
 
 def convert_meters_to_miles(meters):
     return meters * 0.000621371
+
+
+def find_center_point(users_locations):
+    x = 0
+    y = 0
+    z = 0
+
+    for user in users_locations:
+        lat = user.get("lat") * pi / 180
+        lng = user.get("lng") * pi / 180
+        x += (cos(lat) * cos(lng))
+        y += (cos(lat) * sin(lng))
+        z += sin(lat)
+
+    avg_x = x / len(users_locations)
+    avg_y = y / len(users_locations)
+    avg_z = z / len(users_locations)
+
+    center_lng = (atan2(avg_y, avg_x) * 180 / pi)
+    center_hyp = sqrt(avg_x * avg_x + avg_y * avg_y)
+    center_lat = (atan2(avg_z, center_hyp) * 180 / pi)
+
+    return {"lat": center_lat, "lng": center_lng}
