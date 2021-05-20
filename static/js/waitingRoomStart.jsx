@@ -2,7 +2,7 @@
 // https://web.dev/how-to-use-local-https/
 // https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 
-function WaitingRoom(props) {
+function WaitingRoomStart(props) {
     const [isHost, setIsHost] = React.useState(false);
     const [usersLocations, setUsersLocations] = React.useState([]);
     const [errorMessage, setErrorMessage] = React.useState(null);
@@ -66,6 +66,8 @@ function WaitingRoom(props) {
                                 window.location.replace("/quiz");
                             }
                         });
+                    } else if (res.msg == "fail") {
+                        setErrorMessage('Not enough restaurants within the distance range. Try a larger maximum distance.')
                     }
 
                 })
@@ -91,24 +93,7 @@ function WaitingRoom(props) {
     );
 }
 
-// function ParticipantList(props) {
-
-//     const participants = props.participants;
-//     const participantsInfo = [];
-//     for (const participant of participants) {
-//         participantsInfo.push(
-//             <p key={`user${participant.user_id}`}>{participant.fname}</p>
-//         );
-//     }
-//     return (
-//         <div>
-//             {participantsInfo}
-//         </div>
-//     );
-
-// }
-
 ReactDOM.render(
-    <WaitingRoom />,
+    <WaitingRoomStart />,
     document.querySelector('#root')
 );
