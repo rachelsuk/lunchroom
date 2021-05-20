@@ -120,8 +120,8 @@ function CriteriaForm(props) {
         });
     }
 
-    function redirectWaitingRoom() {
-        window.location.replace('/waiting-room');
+    function redirectWaitingRoomStart() {
+        window.location.replace('/waiting-room-start');
     }
 
 
@@ -138,7 +138,7 @@ function CriteriaForm(props) {
                 </select>
                 <input type="submit" />
             </form>
-            <button onClick={redirectWaitingRoom}>I'm finished. Continue to waiting room.</button>
+            <button onClick={redirectWaitingRoomStart}>I'm finished. Continue to waiting room.</button>
         </React.Fragment>
     );
 }
