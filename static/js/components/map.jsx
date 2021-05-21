@@ -1,6 +1,9 @@
 // https://engineering.universe.com/building-a-google-map-in-react-b103b4ee97f1
 // https://stackoverflow.com/questions/15719951/auto-center-map-with-multiple-markers-in-google-maps-api-v3
 
+// TODO: move distance matrix to back-end
+// TODO: show all restaurants (disable info for other restaurants and show restaurant as different color during quiz) to prevent re-rendering
+// on hover: don't open up info window, but show data to the right of the map.
 function GoogleMap(props) {
     const businesses = props.businesses;
     const usersLocations = props.usersLocations;
@@ -11,34 +14,32 @@ function GoogleMap(props) {
     const savedCallback = React.useRef();
 
     function markerCallback(marker, isUser) {
+
         console.log("callback function.");
         console.log(marker)
         console.log(isUser)
+
         if (isUser) {
             setUserMarker({ index: marker.index, name: marker.title });
+
         } else {
             console.log("setting business marker...")
             console.log(marker.title)
             setBusinessMarker({ index: marker.index, name: marker.title });
-        }
-        console.log(userMarker);
-        console.log(businessMarker);
 
-        if (userMarker && businessMarker) {
-            setDistance(findDistance(userMarker.index, businessMarker.index));
         }
     }
 
     React.useEffect(() => {
+        if (userMarker && businessMarker) {
+            setDistance(findDistance(userMarker.index, businessMarker.index));
+        }
         savedCallback.current = markerCallback;
-    })
+    }, [userMarker, businessMarker])
+
+
 
     React.useEffect(() => {
-
-        setDistance(null);
-        setBusinessMarker(null);
-        setUserMarker(null);
-
         // create googlemaps map
         const googleMap = new google.maps.Map(
             document.getElementById("google-map"));
@@ -104,9 +105,8 @@ function GoogleMap(props) {
                 console.log("business clicked.")
 
                 savedCallback.current(marker, false);
-
-
             });
+
         }
 
         // create markers for each user
@@ -159,7 +159,6 @@ function GoogleMap(props) {
             marker.addListener('click', () => {
                 console.log("user clicked.")
                 savedCallback.current(marker, true);
-
             });
         }
 
@@ -185,6 +184,12 @@ function GoogleMap(props) {
         // auto center map to fit all business and user markers
         googleMap.fitBounds(bounds);
         googleMap.panToBounds(bounds);
+
+        return function cleanup() {
+            setDistance(null);
+            setBusinessMarker(null);
+            setUserMarker(null);
+        };
     }, [businesses, usersLocations]);
 
     function findDistance(user_index, business_index) {
