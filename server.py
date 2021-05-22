@@ -1,3 +1,5 @@
+# TODO: CHROME EXTENSION: Save yelp restaurants
+
 """Server for YelpHelper"""
 
 from flask import Flask, render_template, request, redirect, url_for, flash, session
@@ -282,6 +284,30 @@ def retrieve_businesses():
 @app.route('/quiz')
 def quiz():
     return render_template('quiz.html')
+
+
+@app.route('/save-distances.json', methods=['POST'])
+def save_distances():
+    yelphelper_session_id = session['yelphelper_session_id']
+    yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
+    users_locations = crud.get_users_locations(yelphelper_session_id)
+    businesses_locations = crud.get_businesses_locations(yelphelper_session_id)
+    distance_response = distance_matrix_api.return_distances(
+        users_locations, businesses_locations)
+    yelphelper_session.distance_matrix = distance_response
+    db.session.add(yelphelper_session)
+    db.session.commit()
+    return {'msg': 'success'}
+
+
+@app.route('/get-distances.json')
+def get_distances():
+    yelphelper_session_id = session['yelphelper_session_id']
+    yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
+    msg = 'fail'
+    if yelphelper_session.distance_matrix:
+        msg = 'success'
+    return {'msg': msg, 'distance_matrix': yelphelper_session.distance_matrix}
 
 
 @app.route('/businesses.json')
