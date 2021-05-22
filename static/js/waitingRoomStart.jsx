@@ -61,11 +61,16 @@ function WaitingRoomStart(props) {
                 setErrorMessage("Maximum distance has been accepted!");
                 $.post('/retrieve-businesses.json', (res) => {
                     if (res.msg == 'success') {
-                        $.post('/start-quiz.json', (res) => {
-                            if (res.started) {
-                                window.location.replace("/quiz");
+                        $.post('/save-distances.json', (res) => {
+                            if (res.msg == 'success') {
+                                $.post('/start-quiz.json', (res) => {
+                                    if (res.started) {
+                                        window.location.replace("/quiz");
+                                    }
+                                });
                             }
                         });
+
                     } else if (res.msg == "fail") {
                         setErrorMessage('Not enough restaurants within the distance range. Try a larger maximum distance.')
                     }
