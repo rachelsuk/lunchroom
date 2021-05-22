@@ -47,3 +47,12 @@ def get_users_locations(yelphelper_session_id):
             users_locations.append(
                 {"fname": u.fname, "lat": user.lat, "lng": user.lng})
     return users_locations
+
+
+def get_businesses_locations(yelphelper_session_id):
+    businesses = get_businesses_by_yelphelper_session_id(yelphelper_session_id)
+    businesses_locations = []
+    for b in businesses:
+        businesses_locations.append(
+            {"alias": b.alias, "lat": b.lat, "lng": b.lng})
+    return businesses_locations
