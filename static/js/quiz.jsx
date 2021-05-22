@@ -1,6 +1,6 @@
 // TODO: 
 // directions service: https://developers.google.com/maps/documentation/javascript/directions
-// distance matrix: https://developers.google.com/maps/documentation/javascript/distancematrix
+// TODO: save restaurant to profile.
 
 function QuizContainer(props) {
     const [businesses, setBusinesses] = React.useState([]);
@@ -51,14 +51,16 @@ function QuizContainer(props) {
 
     return (
         <React.Fragment>
-            {businesses.length > 0 ? <Quiz business=
-                {businesses[businessIndex]} usersLocations={usersLocations} submitHandler={submitHandler} /> : null}
+            {businesses.length > 0 ? <Quiz businesses={businesses} businessIndex={businessIndex}
+                usersLocations={usersLocations} submitHandler={submitHandler} /> : null}
         </React.Fragment>
     );
 }
 
 function Quiz(props) {
-    const business = props.business;
+    const businesses = props.businesses;
+    const businessIndex = props.businessIndex;
+    const business = businesses[businessIndex]
     const usersLocations = props.usersLocations;
 
     return (
@@ -75,7 +77,7 @@ function Quiz(props) {
                     <input type='submit' />
                 </form>
             </div>
-            <GoogleMap businesses={[business]} usersLocations={usersLocations} />
+            <GoogleMap businesses={businesses} businessIndex={businessIndex} usersLocations={usersLocations} />
         </React.Fragment>
     )
 }
