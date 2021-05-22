@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects.postgresql import JSON
 from datetime import date
 
 # https://stackabuse.com/using-sqlalchemy-with-flask-and-postgresql/
@@ -33,7 +34,7 @@ class YelpHelperSession(db.Model):
     started = db.Column(db.Boolean, default=False)
     completed = db.Column(db.Boolean, default=False)
     max_distance = db.Column(db.Float)
-
+    distance_matrix = db.Column(JSON)
     users = db.relationship("User",
                             secondary="users_yelphelper_sessions",
                             backref="yelphelper_sessions")
@@ -75,6 +76,8 @@ class UserYelpHelperSession(db.Model):
 
     def __repr__(self):
         return f"<User {self.user_id} YelpHelper Session {self.yelphelper_session_id}>"
+
+    # type: distance based or location based.
 
 
 class Business(db.Model):
