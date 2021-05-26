@@ -60,7 +60,7 @@ function QuizContainer(props) {
 function Quiz(props) {
     const businesses = props.businesses;
     const businessIndex = props.businessIndex;
-    const business = businesses[businessIndex]
+    const business = businesses[businessIndex];
     const usersLocations = props.usersLocations;
 
     return (
@@ -77,7 +77,7 @@ function Quiz(props) {
                     <input type='submit' />
                 </form>
             </div>
-            <GoogleMap businesses={businesses} businessIndex={businessIndex} usersLocations={usersLocations} />
+            <QuizGoogleMap business={business} businessIndex={businessIndex} usersLocations={usersLocations} />
         </React.Fragment>
     )
 }
