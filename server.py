@@ -241,6 +241,9 @@ def retrieve_businesses():
     print(f'starting business count: {businesses_left}')
     print(yelphelper_session.businesses)
     while businesses_left > 0:
+        if index >= longest_list:
+            msg = "fail"
+            businesses_left = 0
         for api_response in yelp_api_responses.values():
             try:
                 print(api_response)
@@ -274,10 +277,6 @@ def retrieve_businesses():
                 break
             print(f'business count: {businesses_left}')
         index += 1
-        if index >= longest_list:
-            msg = "fail"
-            businesses_left = 0
-
     return {'msg': msg}
 
 
