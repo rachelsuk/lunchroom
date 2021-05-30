@@ -1,7 +1,8 @@
 function ResultsContainer(props) {
     const [businessesResults, setBusinessesResults] = React.useState([]);
     const [usersLocations, setUsersLocations] = React.useState([]);
-    const [businessIndex, setBusinessIndex] = React.useState(0)
+    const [businessIndex, setBusinessIndex] = React.useState(0);
+    const [errorMessage, setErrorMessage] = React.useState(null);
     const businessesInfo = [];
 
     React.useEffect(() => {
@@ -17,7 +18,7 @@ function ResultsContainer(props) {
         businessesInfo.push(
             <div className="business" key={business.alias}>
                 <h2>{businessIndex + 1}.</h2>
-                <Business business={business} />
+                <Business business={business} showSaveButton={true} setErrorMessage={setErrorMessage} />
                 <p>{business.total_score}</p>
             </div>
         );
@@ -30,10 +31,11 @@ function ResultsContainer(props) {
     function showNextBusiness() {
         setBusinessIndex(businessIndex + 1);
     }
-
+    const url = window.location.href;
     return (
         <React.Fragment>
-            <a href={'/'}>Return to Homepage</a>
+            <Header url={url} />
+            {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
             <GoogleMap businesses={businessesResults} usersLocations={usersLocations} />
             {businessesInfo ? <div>{businessesInfo[businessIndex]}</div> : null}
             {businessIndex != 0 ? <button onClick={showPreviousBusiness}>Back</button> : null}
