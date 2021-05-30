@@ -24,7 +24,6 @@ function SavedBusinesses(props) {
 
     function removeBusiness(evt) {
         let id = evt.target.parentElement.id
-        let index = evt.target.parentElement.index
         $.post('/remove-saved-business.json', { 'saved-business-id': id }, (res) => {
             if (res.msg == "success") {
                 setErrorMessage("Business has been removed from saved businesses.")
@@ -32,13 +31,13 @@ function SavedBusinesses(props) {
                     setSavedBusinesses(res.saved_businesses);
                 })
             }
-        })
+        });
     }
 
     for (const [index, business] of savedBusinesses.entries()) {
         businessesInfo.push(
             <div className="business" index={index} id={business.saved_business_id} key={business.alias}>
-                <Business business={business} />
+                <Business business={business} showSaveButton={false} />
                 <button onClick={removeBusiness}>Remove</button>
             </div>
         );
