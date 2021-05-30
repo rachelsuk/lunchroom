@@ -10,7 +10,7 @@ function Header(props) {
     function processLogOut() {
         $.get('/process-logout', (res) => {
             setLoggedIn(false);
-            window.location.replace(`${props.url}`);
+            window.location.replace('/');
         });
     }
 
