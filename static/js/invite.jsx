@@ -103,6 +103,13 @@ function UserLocationInput(props) {
 }
 
 function CriteriaForm(props) {
+    const [savedBusinesses, setSavedBusinesses] = React.useState([]);
+
+    React.useEffect(() => {
+        $.get('/get-saved-businesses.json', (res) => {
+            setSavedBusinesses(res.saved_businesses);
+        });
+    }, []);
 
     function submitCriteria(evt) {
         evt.preventDefault();
@@ -129,8 +136,30 @@ function CriteriaForm(props) {
         window.location.replace('/waiting-room-start');
     }
 
+    function addBusiness(evt) {
+        let id = evt.target.parentElement.id
+        $.post('/add-saved-business-to-yp-session.json', { 'saved-business-id': id }, (res) => {
+            if (res.msg == "success") {
+                props.setErrorMessage("Business has been added to the session.")
+            } else if (res.msg == "already added") {
+                props.setErrorMessage("Business has already been added to the session.")
+            }
+        });
+    }
+
+    const businessesInfo = [];
+    for (const [index, business] of savedBusinesses.entries()) {
+        businessesInfo.push(
+            <div className="business" index={index} id={business.saved_business_id} key={business.alias}>
+                <Business business={business} showSaveButton={false} />
+                <button onClick={addBusiness}>Add Business.</button>
+            </div>
+        );
+    }
+
     return (
         <React.Fragment>
+            <button onClick={redirectWaitingRoomStart}>I'm finished. Continue to waiting room.</button>
             <form onSubmit={submitCriteria} id="criteria-form">
                 Food: <input type="text" name="search_term" />
                 Price Level:
@@ -146,7 +175,7 @@ function CriteriaForm(props) {
                 Find Specific Restaurant: <input type="text" id="specific-business-input"></input>
                 <button onClick={findBusiness}>Find Restaurant.</button>
             </div>
-            <button onClick={redirectWaitingRoomStart}>I'm finished. Continue to waiting room.</button>
+            <div>{businessesInfo}</div>
         </React.Fragment>
     );
 }
