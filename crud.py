@@ -1,6 +1,6 @@
 """CRUD operations."""
 
-from model import db, User, YelpHelperSession, UserYelpHelperSession, Business, Score, connect_to_db
+from model import db, User, YelpHelperSession, UserYelpHelperSession, Business, Score, SavedBusiness, connect_to_db
 from sqlalchemy.sql import func
 from sqlalchemy import desc
 
@@ -56,3 +56,9 @@ def get_businesses_locations(yelphelper_session_id):
         businesses_locations.append(
             {"alias": b.alias, "lat": b.lat, "lng": b.lng})
     return businesses_locations
+
+
+def get_saved_businesses(user_id):
+    saved_businesses = db.session.query(
+        SavedBusiness).filter(user_id == user_id).all()
+    return saved_businesses
