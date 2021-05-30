@@ -123,6 +123,16 @@ class Score(db.Model):
         return f"<Rating by user {self.user_id} for business {self.business_id} during yelphelper session {self.yelphelper_session_id}>"
 
 
+class SavedBusiness(db.Model):
+    __tablename__ = 'saved_businesses'
+    saved_business_id = db.Column(
+        db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    business_id = db.Column(
+        db.Integer, db.ForeignKey('businesses.business_id'))
+    business = db.relationship('Business')
+
+
 def connect_to_db(app):
     """Connect the database to our Flask app."""
 
