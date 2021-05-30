@@ -64,22 +64,11 @@ function Quiz(props) {
     const usersLocations = props.usersLocations;
     const [errorMessage, setErrorMessage] = React.useState(null);
 
-    function addToSavedBusinesses() {
-
-        $.post('/add-to-saved-businesses.json', { 'business-alias': business.alias }, (res) => {
-            if (res.msg == "success") {
-                setErrorMessage("Business has been added to your saved businesses.")
-            } else if (res.msg == "already entered") {
-                setErrorMessage("Business was already previously added.")
-            }
-        })
-    }
-
     return (
         <React.Fragment>
             {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
             <div id='business-quiz'>
-                <Business business={business} />
+                <Business business={business} showSaveButton={true} setErrorMessage={setErrorMessage} />
                 <form id='business-score' onSubmit={props.submitHandler}>
                     <select name="business_score">
                         <option value="0">Absolutely not</option>
@@ -89,7 +78,6 @@ function Quiz(props) {
                     </select>
                     <input type='submit' />
                 </form>
-                <button onClick={addToSavedBusinesses}>Add to my saved businesses.</button>
             </div>
             <QuizGoogleMap business={business} businessIndex={businessIndex} usersLocations={usersLocations} />
         </React.Fragment>
