@@ -43,7 +43,7 @@ function WaitingRoomStart(props) {
 
                 savedCallback.current(result.users_locations);
             });
-        }, 5000);
+        }, 300);
         return () => clearInterval(interval);
     }, []);
 
