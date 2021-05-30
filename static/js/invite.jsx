@@ -1,6 +1,9 @@
 // https://www.w3schools.com/html/html5_geolocation.asp
 // https://web.dev/how-to-use-local-https/
 
+// TODO: add criteria form - one restaurant.
+// TODO (nice to have): show list of your saved restaurants
+
 function Invite(props) {
     const [location, setLocation] = React.useState(false);
     const [isHost, setIsHost] = React.useState(false);
@@ -52,12 +55,10 @@ function UserLocationInput(props) {
                 },
                 function (error) {
                     console.error("Error Code = " + error.code + " - " + error.message);
-                    props.setErrorMessage(null)
                     props.setErrorMessage('Could not get location. Please provide zipcode instead.')
                 }
             );
         } else {
-            props.setErrorMessage(null)
             props.setErrorMessage('Could not get location. Please provide zipcode instead.')
         }
     }
@@ -80,7 +81,6 @@ function UserLocationInput(props) {
                 });
             })
         } else {
-            props.setErrorMessage(null)
             props.setErrorMessage('Not a valid zipcode - must be 5 integers long.')
         }
 
@@ -111,19 +111,23 @@ function CriteriaForm(props) {
 
         $.post('/add-search-criteria.json', criteriaData, (res) => {
             if (res.msg == "success") {
-                props.setErrorMessage(null)
                 props.setErrorMessage("Your criteria has been added!");
             } else {
-                props.setErrorMessage(null)
                 props.setErrorMessage("Something went wrong. Try again.");
             }
         });
     }
 
+    function findBusiness(evt) {
+        const business = $('#specific-business-input').value
+        $.get('/get-specific-business.json', { 'business': business }, (res) => {
+
+        })
+    }
+
     function redirectWaitingRoomStart() {
         window.location.replace('/waiting-room-start');
     }
-
 
     return (
         <React.Fragment>
@@ -138,6 +142,10 @@ function CriteriaForm(props) {
                 </select>
                 <input type="submit" />
             </form>
+            <div>
+                Find Specific Restaurant: <input type="text" id="specific-business-input"></input>
+                <button onClick={findBusiness}>Find Restaurant.</button>
+            </div>
             <button onClick={redirectWaitingRoomStart}>I'm finished. Continue to waiting room.</button>
         </React.Fragment>
     );
