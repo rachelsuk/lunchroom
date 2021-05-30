@@ -84,6 +84,7 @@ class Business(db.Model):
     __tablename__ = 'businesses'
 
     business_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    yelp_id = db.Column(db.Text)
     alias = db.Column(db.Text)
     name = db.Column(db.Text)
     image_url = db.Column(db.Text)
