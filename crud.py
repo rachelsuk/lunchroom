@@ -60,5 +60,5 @@ def get_businesses_locations(yelphelper_session_id):
 
 def get_saved_businesses(user_id):
     saved_businesses = db.session.query(
-        SavedBusiness).filter(user_id == user_id).all()
+        SavedBusiness).filter(SavedBusiness.user_id == user_id).all()
     return saved_businesses
