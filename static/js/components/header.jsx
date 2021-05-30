@@ -5,11 +5,12 @@ function Header(props) {
         $.get('/check-login.json', (res) => {
             setLoggedIn(res.logged_in);
         });
-    },[]);
+    }, []);
 
     function processLogOut() {
         $.get('/process-logout', (res) => {
             setLoggedIn(false);
+            window.location.replace(`${props.url}`);
         });
     }
 
@@ -17,9 +18,15 @@ function Header(props) {
         window.location.replace(`/login?url=${props.url}`);
     }
 
+    function redirectProfile() {
+        window.location.replace(`/profile`)
+    }
+
     return (
         <div>
-           {loggedIn ? <button onClick={processLogOut}>Logout</button> : <button onClick={redirectLogIn}>Login</button>}
+            <a href="/">YelpHelper</a>
+            {loggedIn ? <button onClick={processLogOut}>Logout</button> : <button onClick={redirectLogIn}>Login</button>}
+            {loggedIn ? <button onClick={redirectProfile}>My Profile</button> : null}
         </div>
-        );
+    );
 }
