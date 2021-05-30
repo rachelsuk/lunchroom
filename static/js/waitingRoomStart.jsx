@@ -48,6 +48,10 @@ function WaitingRoomStart(props) {
     }, []);
 
     function startQuiz() {
+        $.get('/check-distance.json', { "max-distance": 0 }, (res) => {
+            $('#minimum-distance').html(`Maximum distance must at least ${res.min_max_distance} miles.`)
+        });
+
         setStarted(true);
     }
 
@@ -88,11 +92,13 @@ function WaitingRoomStart(props) {
         <React.Fragment>
             {isHost && !started ? <button onClick={startQuiz}>Let's Start!</button> : null}
             {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
-            {started ? (<form onSubmit={checkDistance} id="max-distance-form">
-                <label>Maximum Distance: </label>
-                <input type="text" name="max-distance" id="max-distance-field" />
-                <input type="submit" />
-            </form>) : null}
+            {started ? (<React.Fragment>
+                <div id="minimum-distance"></div>
+                <form onSubmit={checkDistance} id="max-distance-form">
+                    <label>Maximum Distance: </label>
+                    <input type="text" name="max-distance" id="max-distance-field" />
+                    <input type="submit" />
+                </form></React.Fragment>) : null}
             <GoogleMap usersLocations={usersLocations} businesses={[]} />
         </React.Fragment>
     );
