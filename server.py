@@ -234,6 +234,21 @@ def retrieve_businesses():
             longest_list = len(businesses)
         print(yelp_api_responses)
 
+    if len(search_criterias) == 0:
+        businesses = yelp_api.business_search(
+            center_point.get("lat"), center_point.get("lng"))
+        businesses_locations = []
+        for business in businesses:
+            businesses_locations.append({"lat": business.get("coordinates").get(
+                "latitude"), "lng": business.get("coordinates").get("longitude")})
+        indices_to_remove = distance_matrix_api.check_below_max_distance(
+            users_locations, businesses_locations, max_distance)
+        for index in sorted(list(indices_to_remove), reverse=True):
+            del businesses[index]
+        yelp_api_responses[1] = businesses
+        if len(businesses) > longest_list:
+            longest_list = len(businesses)
+
     existing_businesses_count = len(yelphelper_session.businesses)
     businesses_left = 10 - existing_businesses_count
     index = 0
@@ -254,15 +269,20 @@ def retrieve_businesses():
                     yelphelper_session=yelphelper_session, alias=alias).first()
                 if not business_already_added:
                     name = business.get("name")
+                    print(name)
+                    yelp_id = business.get("id")
                     image_url = business.get("image_url")
                     url = business.get("url")
                     review_count = business.get("review_count")
                     yelp_rating = business.get("rating")
-                    price = len(business.get("price"))
+                    if business.get("price"):
+                        price = len(business.get("price"))
+                    else:
+                        price = None
                     address = business.get("location").get("display_address")
                     lat = business.get("coordinates").get("latitude")
                     lng = business.get("coordinates").get("longitude")
-                    new_business = Business(alias=alias, name=name, image_url=image_url,
+                    new_business = Business(yelp_id=yelp_id, alias=alias, name=name, image_url=image_url,
                                             url=url, review_count=review_count,
                                             yelp_rating=yelp_rating, price=price,
                                             address=address,
@@ -316,7 +336,7 @@ def businesses_data():
     businesses_list = []
     for b in yelphelper_session_businesses:
         businesses_list.append(
-            {"alias": b.alias, "name": b.name, "yelp_rating": b.yelp_rating,
+            {"alias": b.alias, "yelp_id": b.yelp_id, "name": b.name, "yelp_rating": b.yelp_rating,
              "review_count": b.review_count, "image_url": b.image_url, "url": b.url,
              "lat": b.lat, "lng": b.lng})
     return {"businesses": businesses_list}
@@ -382,7 +402,7 @@ def calculate_results():
     total_scores = []
     for total_score in ordered_total_scores:
         b = Business.query.get(total_score.business_id)
-        total_scores.append({"alias": b.alias, "name": b.name, "yelp_rating": b.yelp_rating,
+        total_scores.append({"alias": b.alias, "yelp_id": b.yelp_id, "name": b.name, "yelp_rating": b.yelp_rating,
                             "review_count": b.review_count, "image_url": b.image_url, "url": b.url, "total_score": total_score.total_score,
                              "lat": b.lat, "lng": b.lng})
 
@@ -405,7 +425,7 @@ def get_saved_businesses():
     for saved_business in saved_businesses:
         b = saved_business.business
         businesses_data.append(
-            {"saved_business_id": saved_business.saved_business_id, "alias": b.alias, "url": b.url, "name": b.name, "image_url": b.image_url, "address": b.address})
+            {"saved_business_id": saved_business.saved_business_id, "alias": b.alias, "yelp_id": b.yelp_id, "url": b.url, "name": b.name, "image_url": b.image_url, "address": b.address})
     return {"saved_businesses": businesses_data}
 
 
@@ -437,6 +457,43 @@ def remove_saved_business():
     db.session.commit()
 
     return {"msg": "success"}
+
+
+@app.route('/add-saved-business-to-yp-session.json', methods=['POST'])
+def add_saved_business_to_yp_session():
+    yelphelper_session_id = session['yelphelper_session_id']
+    saved_business_id = request.form.get('saved-business-id')
+    saved_business = SavedBusiness.query.get(saved_business_id)
+    yelp_id = saved_business.business.yelp_id
+    business = yelp_api.business_details(yelp_id)
+    print(business)
+    yp_session_businesses = crud.get_businesses_by_yelphelper_session_id(
+        yelphelper_session_id)
+    msg = 'success'
+    for session_business in yp_session_businesses:
+        if session_business.alias == business['alias']:
+            msg = 'already added'
+    if msg == 'success':
+        alias = business.get("alias")
+        name = business.get("name")
+        yelp_id = business.get("id")
+        image_url = business.get("image_url")
+        url = business.get("url")
+        review_count = business.get("review_count")
+        yelp_rating = business.get("rating")
+        price = len(business.get("price"))
+        address = business.get("location").get("display_address")
+        lat = business.get("coordinates").get("latitude")
+        lng = business.get("coordinates").get("longitude")
+        new_business = Business(yelp_id=yelp_id, alias=alias, name=name, image_url=image_url,
+                                url=url, review_count=review_count,
+                                yelp_rating=yelp_rating, price=price,
+                                address=address,
+                                lat=lat, lng=lng,
+                                yelphelper_session_id=yelphelper_session_id)
+        db.session.add(new_business)
+        db.session.commit()
+    return {"msg": msg}
 
 
 if __name__ == '__main__':
