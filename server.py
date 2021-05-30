@@ -5,7 +5,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import model
 import crud
-from model import db, User, YelpHelperSession, UserYelpHelperSession, Business, Score, SearchCriteria
+from model import db, User, YelpHelperSession, UserYelpHelperSession, Business, Score, SearchCriteria, SavedBusiness
 import yelp_api
 import geocoding_api
 import distance_matrix_api
@@ -387,6 +387,56 @@ def calculate_results():
                              "lat": b.lat, "lng": b.lng})
 
     return {"total_scores": total_scores}
+
+
+@app.route('/profile')
+def profile_page():
+    if 'user_id' in session:
+        return render_template('profile.html')
+    else:
+        return redirect('/')
+
+
+@app.route('/get-saved-businesses.json')
+def get_saved_businesses():
+    user_id = session['user_id']
+    saved_businesses = crud.get_saved_businesses(user_id)
+    businesses_data = []
+    for saved_business in saved_businesses:
+        b = saved_business.business
+        businesses_data.append(
+            {"saved_business_id": saved_business.saved_business_id, "alias": b.alias, "url": b.url, "name": b.name, "image_url": b.image_url, "address": b.address})
+    return {"saved_businesses": businesses_data}
+
+
+@app.route('/add-to-saved-businesses.json', methods=['POST'])
+def add_to_saved_businesses():
+    business_alias = request.form.get('business-alias')
+    user_id = session['user_id']
+    yelphelper_session_id = session['yelphelper_session_id']
+    business = db.session.query(Business).filter(
+        Business.alias == business_alias, Business.yelphelper_session_id == yelphelper_session_id).first()
+    saved_businesses = crud.get_saved_businesses(user_id)
+    for saved_business in saved_businesses:
+        b = saved_business.business
+        if b.alias == business.alias:
+            return {"msg": "already entered"}
+
+    saved_business = SavedBusiness(
+        user_id=user_id, business_id=business.business_id)
+    db.session.add(saved_business)
+    db.session.commit()
+
+    return {"msg": "success"}
+
+
+@app.route('/remove-saved-business.json', methods=['POST'])
+def remove_saved_business():
+    saved_business_id = request.form.get('saved-business-id')
+    SavedBusiness.query.filter_by(saved_business_id=saved_business_id).delete()
+    db.session.commit()
+
+    return {"msg": "success"}
 
 
 if __name__ == '__main__':
