@@ -88,7 +88,6 @@ function UserLocationInput(props) {
 
     return (
         <div id="user-location-form">
-            <div className="error-msg"></div>
             <button onClick={getExactCoords}>Allow Access to My Exact Location.</button>
         OR
             <form onSubmit={getZipCodeCoords} id="zipcode-form">
@@ -133,7 +132,7 @@ function CriteriaForm(props) {
     }
 
     function redirectWaitingRoomStart() {
-        window.location.replace('/waiting-room-start');
+        window.location.assign('/waiting-room-start');
     }
 
     function addBusiness(evt) {
