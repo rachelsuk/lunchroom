@@ -1,0 +1,32 @@
+/* https://www.fontpair.co/pairing/spectral-and-karla */
+/* body {
+  font-family: customfont;
+  src: "/static/fonts/Karla/Karla-Light.ttf";
+} */
+
+.nav-item .btn:hover {
+  outline: #fc363b;
+}
+
+#homepage-brand {
+  font-family: customfont;
+  src: "/static/fonts/Spectral/Spectral-ExtraBoldItalic.ttf";
+  font-size: 7em;
+}
+
+#homepage-main-div {
+  margin-top: 20em;
+}
+
+#start-link {
+  margin-left: 1em;
+}
+
+#start-link:hover {
+  color: #fc363b;
+}
+
+#navbar-brand {
+  font-family: customfont;
+  src: "/static/fonts/Spectral/Spectral-ExtraBoldItalic.ttf";
+}
