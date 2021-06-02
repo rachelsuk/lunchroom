@@ -1,4 +1,5 @@
 function Header(props) {
+    const isHomepage = props.isHomepage;
     const [loggedIn, setLoggedIn] = React.useState(false);
 
     React.useEffect(() => {
@@ -15,18 +16,37 @@ function Header(props) {
     }
 
     function redirectLogIn() {
-        window.location.replace(`/login?url=${props.url}`);
+        window.location.assign(`/login?url=${props.url}`);
     }
 
     function redirectProfile() {
-        window.location.replace(`/profile`)
+        window.location.assign(`/profile`)
     }
 
     return (
-        <div>
-            <a href="/">YelpHelper</a>
-            {loggedIn ? <button onClick={processLogOut}>Logout</button> : <button onClick={redirectLogIn}>Login</button>}
-            {loggedIn ? <button onClick={redirectProfile}>My Profile</button> : null}
-        </div>
+        <nav className="navbar navbar-expand-lg navbar-light">
+            <div className="container-fluid">
+                {!isHomepage ? <a className="navbar-brand" id="navbar-brand" href="/">YelpHelper</a> : null}
+                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span className="navbar-toggler-icon"></span>
+                </button>
+                <div className="collapse navbar-collapse" id="navbarSupportedContent">
+                    {loggedIn ?
+                        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li className="nav-item">
+                                <button className="btn" onClick={redirectProfile}>My Profile</button>
+                            </li>
+                            <li className="nav-item">
+                                <button className="btn" onClick={processLogOut}>Logout</button>
+                            </li>
+                        </ul> :
+                        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li className="nav-item">
+                                <button className="btn" onClick={redirectLogIn}>Login</button>
+                            </li>
+                        </ul>}
+                </div>
+            </div>
+        </nav>
     );
 }
