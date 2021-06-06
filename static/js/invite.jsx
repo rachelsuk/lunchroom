@@ -5,7 +5,6 @@
 // TODO (nice to have): show list of your saved restaurants
 
 function Invite(props) {
-    const [location, setLocation] = React.useState(false);
     const [isHost, setIsHost] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState(null);
 
@@ -25,14 +24,22 @@ function Invite(props) {
         });
     }, []);
 
-    // TO-DO: Change this to react router
+    function copyLink() {
+        const sharedLink = document.querySelector("#shared-link");
+        const sharedlinkText = sharedLink.textContent;
+        navigator.clipboard.writeText(sharedlinkText);
+        setErrorMessage("Link has been copied")
+    }
 
     return (
         <React.Fragment>
-            {isHost ? <div id="invite-link">Invite Link: {url}</div> : null}
-            {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
-            {!location ? <UserLocationInput setLocation={setLocation} setErrorMessage={setErrorMessage} /> : <CriteriaForm setErrorMessage={setErrorMessage} />}
-        </React.Fragment>
+            {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
+            <div id="invite-component" className="center">
+                {isHost && <div id="invite-link"><div>Invite Link:</div><div id="shared-link">{url}</div><button className='btn' onClick={copyLink}>Copy Link</button></div>}
+                <hr />
+                <UserLocationInput setErrorMessage={setErrorMessage} url={url} />
+            </div>
+        </React.Fragment >
     );
 }
 
@@ -49,7 +56,7 @@ function UserLocationInput(props) {
 
                     $.post('/add-user-location', positionData, (res) => {
                         if (res.msg == "success") {
-                            props.setLocation(true);
+                            window.location.assign(`${props.url}/criteria-form?url=${props.url}`);
                         }
                     });
                 },
@@ -76,7 +83,7 @@ function UserLocationInput(props) {
                 }
                 $.post('/add-user-location', positionData, (res) => {
                     if (res.msg == "success") {
-                        props.setLocation(true);
+                        window.location.assign(`${props.url}/criteria-form?url=${props.url}`);
                     }
                 });
             })
@@ -88,95 +95,18 @@ function UserLocationInput(props) {
 
     return (
         <div id="user-location-form">
-            <button onClick={getExactCoords}>Allow Access to My Exact Location.</button>
+            <div id='provide-your-location'>Provide Your Location:</div>
+            <button className="btn" id="exact-location-btn" onClick={getExactCoords}>Share My Location</button>
         OR
-            <form onSubmit={getZipCodeCoords} id="zipcode-form">
-                <label>Zipcode: </label>
+            <form id="zipcode-form">
+                <label>Zipcode:</label>
                 <input type="text" name="zipcode" id="zipcode-field" />
-                <input type="submit" />
+                <button className="btn submit-btn" onClick={getZipCodeCoords}>Submit</button>
             </form>
         </div >
 
     )
 
-}
-
-function CriteriaForm(props) {
-    const [savedBusinesses, setSavedBusinesses] = React.useState([]);
-
-    React.useEffect(() => {
-        $.get('/get-saved-businesses.json', (res) => {
-            setSavedBusinesses(res.saved_businesses);
-        });
-    }, []);
-
-    function submitCriteria(evt) {
-        evt.preventDefault();
-
-        const criteriaData = $('#criteria-form').serialize();
-
-        $.post('/add-search-criteria.json', criteriaData, (res) => {
-            if (res.msg == "success") {
-                props.setErrorMessage("Your criteria has been added!");
-            } else {
-                props.setErrorMessage("Something went wrong. Try again.");
-            }
-        });
-    }
-
-    function findBusiness(evt) {
-        const business = $('#specific-business-input').value
-        $.get('/get-specific-business.json', { 'business': business }, (res) => {
-
-        })
-    }
-
-    function redirectWaitingRoomStart() {
-        window.location.assign('/waiting-room-start');
-    }
-
-    function addBusiness(evt) {
-        let id = evt.target.parentElement.id
-        $.post('/add-saved-business-to-yp-session.json', { 'saved-business-id': id }, (res) => {
-            if (res.msg == "success") {
-                props.setErrorMessage("Business has been added to the session.")
-            } else if (res.msg == "already added") {
-                props.setErrorMessage("Business has already been added to the session.")
-            }
-        });
-    }
-
-    const businessesInfo = [];
-    for (const [index, business] of savedBusinesses.entries()) {
-        businessesInfo.push(
-            <div className="business" index={index} id={business.saved_business_id} key={business.alias}>
-                <Business business={business} showSaveButton={false} />
-                <button onClick={addBusiness}>Add Business.</button>
-            </div>
-        );
-    }
-
-    return (
-        <React.Fragment>
-            <button onClick={redirectWaitingRoomStart}>I'm finished. Continue to waiting room.</button>
-            <form onSubmit={submitCriteria} id="criteria-form">
-                Food: <input type="text" name="search_term" />
-                Price Level:
-                <select name="price">
-                    <option value="1">$</option>
-                    <option value="2">$$</option>
-                    <option value="3">$$$</option>
-                    <option value="4">$$$</option>
-                </select>
-                <input type="submit" />
-            </form>
-            <div>
-                Find Specific Restaurant: <input type="text" id="specific-business-input"></input>
-                <button onClick={findBusiness}>Find Restaurant.</button>
-            </div>
-            <div>{businessesInfo}</div>
-        </React.Fragment>
-    );
 }
 
 ReactDOM.render(
