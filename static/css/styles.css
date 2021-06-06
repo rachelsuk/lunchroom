@@ -9,10 +9,19 @@
   src: url("/static/fonts/Spectral/Spectral-Regular.ttf");
 }
 
+@font-face {
+  font-family: karla-regular;
+  src: url("/static/fonts/Karla/Karla-Regular.ttf");
+}
+
 body {
   font-family: karla-medium;
   background-color: #0f1a26;
   color: white;
+}
+
+#root {
+  margin-bottom: 5em;
 }
 
 .btn {
@@ -34,6 +43,10 @@ body {
   margin-top: 20em;
 }
 
+#homepage-blob {
+  z-index: -1;
+}
+
 #start-link {
   margin-left: 1em;
   font-size: 1.5em;
@@ -52,15 +65,15 @@ body {
 
 .center {
   margin: auto;
-  margin-top: 15%;
+  margin-top: 10%;
   width: 60%;
   text-align: center;
 }
 
 #invite-link {
   font-family: spectral-regular;
-  margin-bottom: 2em;
-  font-size: 2.5vw;
+  margin-bottom: 1em;
+  font-size: 2vw;
   color: white;
 }
 
@@ -73,6 +86,35 @@ body {
   padding: 5px;
 }
 
+#exact-location-btn:hover {
+  color: white;
+  background-color: #1a6a62;
+}
+
+.submit-btn {
+  color: black;
+  display: inline-block;
+  background-color: #bfced9;
+  border-radius: 15px;
+  margin: 0.5em;
+  padding: 5px 15px;
+}
+
+.submit-btn:hover {
+  color: white;
+  background-color: #1a6a62;
+}
+
+#submit-criteria-btn {
+  background-color: #fc363b;
+  color: white;
+}
+
+#submit-criteria-btn:hover {
+  color: white;
+  background-color: #1a6a62;
+}
+
 #zipcode-form {
   display: inline-block;
   margin: 2em;
@@ -80,13 +122,13 @@ body {
 }
 
 #footer {
-  position: absolute;
-  text-align: center;
+  position: fixed;
+  left: 0;
   bottom: 0;
-  padding: 10px;
   width: 100%;
-  height: 2.5rem;
-  color: white;
+  background-color: white;
+  text-align: center;
+  color: #0f1a26;
 }
 
 #provide-your-location {
@@ -95,10 +137,18 @@ body {
   font-size: 2.5vw;
 }
 
-/* #invite-component {
-  outline-style: double;
-  outline-color: #1a6a62;
-} */
+#user-location-form {
+  margin-top: 2em;
+}
+
+#criteria-form-component {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+#criteria-form {
+  margin: 2em;
+}
 
 #zipcode-field {
   margin: 5px;
@@ -108,9 +158,113 @@ input[type="text"] {
   border-radius: 4px;
 }
 
-input[type="submit"] {
+#choose-saved-businesses {
+  height: 30vw;
+  margin: auto;
+  width: 60%;
+}
+
+#go-to-waiting-room-btn {
+  margin: 1em 2em;
+  font-size: 1.5em;
+}
+
+.price-label {
+  display: inline-block;
+  width: 50px;
+  height: 30px;
+  line-height: 30px;
+  background-color: #bfced9;
+  text-align: center;
+  border-radius: 50%;
+  margin: 0.75em;
+  color: #0f1a26;
+}
+input[type="radio"] {
+  display: none;
+}
+
+input[type="radio"]:checked + label {
+  background-color: #1a6a62;
+  color: white;
+}
+
+input[type="radio"]:hover + label {
+  background-color: #1a6a62;
+  color: white;
+}
+
+#price-level-container {
+  margin-top: 1em;
+}
+
+.arrow {
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+}
+
+.down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  margin: 0.5em 0.2em 0.2em 0.5em;
+}
+
+.up {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+  margin: 0.5em 0em 0em 0.5em;
+}
+
+.business-container {
+  margin: 2em;
+}
+
+.business-info {
+  display: inline-block;
+  margin: 1em;
+}
+
+.business-btns {
+  display: inline-block;
+  margin: 1em;
+}
+
+.business-name {
+  font-family: spectral-regular;
+  color: white;
+  font-size: 2em;
+  text-decoration: None;
+}
+
+.business-name:hover {
+  color: #fc363b;
+}
+
+.add-restaurant-btn {
   color: black;
   background-color: #bfced9;
   border-radius: 15px;
-  padding: 5px;
+  padding: 5px 15px;
+}
+
+.add-restaurant-btn:hover {
+  color: white;
+  background-color: #1a6a62;
+}
+
+.criteria-form-labels {
+  font-size: 1.25em;
+  font-family: karla-regular;
+}
+
+.triangle-right {
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-left: 14px solid #fc363b;
+  border-bottom: 7px solid transparent;
+  display: inline-block;
+  margin: 0px 5px;
 }
