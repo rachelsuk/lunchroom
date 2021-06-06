@@ -115,6 +115,11 @@ def invite(yelphelper_session_id):
     return render_template('invite.html')
 
 
+@app.route('/invite/<yelphelper_session_id>/criteria-form')
+def critera_form(yelphelper_session_id):
+    return render_template('criteria_form.html')
+
+
 @app.route('/check-host.json')
 def check_host():
     yelphelper_session_id = session['yelphelper_session_id']
