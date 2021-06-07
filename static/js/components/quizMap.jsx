@@ -38,7 +38,7 @@ function QuizGoogleMap(props) {
 
         // create googlemaps map
         const googleMap = new google.maps.Map(
-            document.getElementById("google-map"));
+            document.getElementById("google-map-quiz"));
 
 
         // create empty lat/lng bounds for the map
@@ -132,7 +132,7 @@ function QuizGoogleMap(props) {
     return (
         <React.Fragment>
             {distance ? <div id="distance">Distance from {userMarker.name} to {businessMarker.name}: {distance} miles.</div> : null}
-            <div id="google-map" style={{ width: '800px', height: '600px' }} />
+            <div id="google-map-quiz" className="google-map" />
         </React.Fragment>
     )
 }
