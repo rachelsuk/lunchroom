@@ -24,7 +24,7 @@ function Header(props) {
     }
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-light">
+        <nav className="navbar navbar-expand-lg navbar-dark">
             <div className="container-fluid">
                 {!isHomepage ? <a className="navbar-brand" id="navbar-brand" href="/">YelpHelper</a> : null}
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
