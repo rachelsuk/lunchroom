@@ -18,7 +18,7 @@ function CriteriaFormContainer(props) {
     React.useEffect(() => {
         $.get('/check-login.json', (res) => {
             if (!res.logged_in) {
-                window.location.replace(`/login?url=${url}`);
+                window.location.assign(`/login?url=${url}`);
             } else {
                 $.get('/check-host.json', (res) => {
                     if (res.is_host) {
@@ -41,7 +41,7 @@ function CriteriaFormContainer(props) {
         <React.Fragment>
             {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
             <div id="criteria-form-container" className="center">
-                {isHost && <div id="invite-link"><div>Invite Link:</div><div id="shared-link">{sharedLink}</div><button className='btn' onClick={copyLink}>Copy Link</button></div>}
+                {isHost && <div id="invite-link"><div>Share this link with everyone participating:</div><div id="shared-link">{sharedLink}</div><button className='btn' onClick={copyLink}>Copy Link</button></div>}
                 <hr />
                 <CriteriaForm setErrorMessage={setErrorMessage} />
             </div>
@@ -75,7 +75,7 @@ function CriteriaForm(props) {
 
             $.post('/add-search-criteria.json', criteriaData, (res) => {
                 if (res.msg == "success") {
-                    props.setErrorMessage("Your criteria has been added!");
+                    props.setErrorMessage("Your preference has been added!");
                 } else {
                     props.setErrorMessage("Something went wrong. Try again.");
                 }
@@ -115,6 +115,7 @@ function CriteriaForm(props) {
         businessesInfo.push(
             <div className="business-component" index={index} key={business.alias}>
                 <Business business={business} showSaveButton={false} showAddButton={true} setErrorMessage={setErrorMessage} />
+                <hr />
             </div>
         );
     }
@@ -136,10 +137,10 @@ function CriteriaForm(props) {
                             <option value="4">$$$</option>
                         </select> */}
                         <div id="price-level-label" className="criteria-form-labels">Price Level:</div>
-                        <input type="radio" className="price" name="price" value="1" id="price-1" /><label className="price-label" htmlFor="price-1">$</label>
-                        <input type="radio" className="price" name="price" value="1" id="price-2" /><label className="price-label" htmlFor="price-2">$$</label>
-                        <input type="radio" className="price" name="price" value="1" id="price-3" /><label className="price-label" htmlFor="price-3">$$$</label>
-                        <input type="radio" className="price" name="price" value="1" id="price-4" /><label className="price-label" htmlFor="price-4">$$$$</label>
+                        <input type="radio" className="price" name="price" value="1" id="price-1" /><label className="price-label radio-label" htmlFor="price-1">$</label>
+                        <input type="radio" className="price" name="price" value="2" id="price-2" /><label className="price-label radio-label" htmlFor="price-2">$$</label>
+                        <input type="radio" className="price" name="price" value="3" id="price-3" /><label className="price-label radio-label" htmlFor="price-3">$$$</label>
+                        <input type="radio" className="price" name="price" value="4" id="price-4" /><label className="price-label radio-label" htmlFor="price-4">$$$$</label>
                     </div>
                     {/* <input type="submit" /> */}
                     <button className="btn submit-btn" id="submit-criteria-btn" onClick={submitCriteria}>Submit Criteria</button>
