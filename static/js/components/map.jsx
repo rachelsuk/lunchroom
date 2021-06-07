@@ -1,7 +1,6 @@
 // https://engineering.universe.com/building-a-google-map-in-react-b103b4ee97f1
 // https://stackoverflow.com/questions/15719951/auto-center-map-with-multiple-markers-in-google-maps-api-v3
 
-// TODO: move distance matrix to back-end
 // TODO: show all restaurants (disable info for other restaurants and show restaurant as different color during quiz) to prevent re-rendering
 // on hover: don't open up info window, but show data to the right of the map.
 function GoogleMap(props) {
@@ -14,19 +13,11 @@ function GoogleMap(props) {
     const savedCallback = React.useRef();
 
     function markerCallback(marker, isUser) {
-
-        console.log("callback function.");
-        console.log(marker)
-        console.log(isUser)
-
         if (isUser) {
             setUserMarker({ index: marker.index, name: marker.title });
 
         } else {
-            console.log("setting business marker...")
-            console.log(marker.title)
             setBusinessMarker({ index: marker.index, name: marker.title });
-
         }
     }
 
@@ -37,9 +28,12 @@ function GoogleMap(props) {
         savedCallback.current = markerCallback;
     }, [userMarker, businessMarker])
 
-
-
     React.useEffect(() => {
+        $.get('/get-distances.json', (res) => {
+            if (res.msg == 'success') {
+                setDistanceResponse(res.distance_matrix);
+            }
+        })
         // create googlemaps map
         const googleMap = new google.maps.Map(
             document.getElementById("google-map"));
@@ -60,20 +54,19 @@ function GoogleMap(props) {
                 url: business.url,
                 totalScore: business.total_score,
                 label: number.toString(),
-                icon: {  // custom icon
-                    url: '/static/img/hamburger.png',
-                    scaledSize: {
-                        width: 30,
-                        height: 30
-                    }
-                }
+                // icon: {  // custom icon
+                //     url: '/static/img/hamburger.png',
+                //     scaledSize: {
+                //         width: 30,
+                //         height: 30
+                //     }
+                // }
             }));
         }
 
         let prevInfoWindow = false;
 
         // create infoWindow for each business with info about business
-        const destinations = [];
         for (const marker of businessMarkers) {
             bounds.extend(marker.position);
 
@@ -92,18 +85,15 @@ function GoogleMap(props) {
                 maxWidth: 200
             });
 
-            destinations.push(new google.maps.LatLng(marker.position.lat(), marker.position.lng()))
-
             marker.addListener('mouseover', () => {
                 if (prevInfoWindow) {
                     prevInfoWindow.close();
                 }
                 prevInfoWindow = infoWindow;
                 infoWindow.open(googleMap, marker);
+
             });
             marker.addListener('click', () => {
-                console.log("business clicked.")
-
                 savedCallback.current(marker, false);
             });
 
@@ -129,7 +119,7 @@ function GoogleMap(props) {
             }
         }
 
-        const origins = [];
+
         // create infoWindow for each user with info about the user
         for (const marker of userMarkers) {
             bounds.extend(marker.position);
@@ -146,8 +136,6 @@ function GoogleMap(props) {
                 maxWidth: 400
             });
 
-            origins.push(new google.maps.LatLng(marker.position.lat(), marker.position.lng()))
-
             marker.addListener('mouseover', () => {
                 if (prevInfoWindow) {
                     prevInfoWindow.close();
@@ -157,35 +145,9 @@ function GoogleMap(props) {
             });
 
             marker.addListener('click', () => {
-                console.log("user clicked.")
                 savedCallback.current(marker, true);
             });
         }
-
-        $.get('/get-distances.json', (res) => {
-            if (res.msg == 'success') {
-                setDistanceResponse(res.distance_matrix);
-            }
-        })
-
-        // const service = new google.maps.DistanceMatrixService();
-        // service.getDistanceMatrix(
-        //     {
-        //         origins: origins,
-        //         destinations: destinations,
-        //         travelMode: 'DRIVING',
-        //         unitSystem: google.maps.UnitSystem.IMPERIAL
-        //     }, distanceCallback);
-
-        // function distanceCallback(res, status) {
-        //     console.log(res)
-        //     if (status == "OK") {
-        //         setDistanceResponse(res);
-        //     } else {
-        //         console.log(status)
-        //     }
-
-        // }
 
         // auto center map to fit all business and user markers
         googleMap.fitBounds(bounds);
@@ -198,19 +160,18 @@ function GoogleMap(props) {
         };
     }, [businesses, usersLocations]);
 
+
+
     function findDistance(user_index, business_index) {
-        console.log(user_index)
-        console.log(distanceResponse.rows[user_index])
         let distance_meters = ((distanceResponse.rows[user_index]).elements[business_index]).distance.value;
         let distance_miles = distance_meters * 0.000621371
         return distance_miles
-
     }
 
     return (
         <React.Fragment>
             {distance ? <div id="distance">Distance from {userMarker.name} to {businessMarker.name}: {distance} miles.</div> : null}
-            <div id="google-map" style={{ width: '800px', height: '600px' }} />
+            <div id="google-map" className="google-map" />
         </React.Fragment>
     )
 }
