@@ -199,6 +199,7 @@ def check_distance():
     yelphelper_session_id = session['yelphelper_session_id']
     yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
     max_distance = float(request.args.get('max-distance'))
+    print(max_distance)
 
     users_locations = crud.get_users_locations(yelphelper_session_id)
     response = distance_matrix_api.check_distance(
@@ -217,8 +218,8 @@ def retrieve_businesses():
     yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
     users_locations = crud.get_users_locations(yelphelper_session_id)
     center_point = distance_matrix_api.find_center_point(users_locations)
-    print(
-        f'center point: {center_point.get("lat")}, {center_point.get("lng")}')
+    # print(
+    #     f'center point: {center_point.get("lat")}, {center_point.get("lng")}')
     max_distance = yelphelper_session.max_distance
     search_criterias = yelphelper_session.search_criterias
     yelp_api_responses = {}
@@ -230,6 +231,8 @@ def retrieve_businesses():
         for business in businesses:
             businesses_locations.append({"lat": business.get("coordinates").get(
                 "latitude"), "lng": business.get("coordinates").get("longitude")})
+        print(businesses_locations)
+        print(len(businesses_locations))
         indices_to_remove = distance_matrix_api.check_below_max_distance(
             users_locations, businesses_locations, max_distance)
         for index in sorted(list(indices_to_remove), reverse=True):
@@ -258,23 +261,23 @@ def retrieve_businesses():
     businesses_left = 10 - existing_businesses_count
     index = 0
     msg = "success"
-    print(f'starting business count: {businesses_left}')
-    print(yelphelper_session.businesses)
+    # print(f'starting business count: {businesses_left}')
+    # print(yelphelper_session.businesses)
     while businesses_left > 0:
         if index >= longest_list:
             msg = "fail"
             businesses_left = 0
         for api_response in yelp_api_responses.values():
             try:
-                print(api_response)
-                print(f'index {index}')
+                # print(api_response)
+                # print(f'index {index}')
                 business = api_response[index]
                 alias = business.get("alias")
                 business_already_added = db.session.query(Business).filter_by(
                     yelphelper_session=yelphelper_session, alias=alias).first()
                 if not business_already_added:
                     name = business.get("name")
-                    print(name)
+                    # print(name)
                     yelp_id = business.get("id")
                     image_url = business.get("image_url")
                     url = business.get("url")
@@ -300,7 +303,7 @@ def retrieve_businesses():
                 pass
             if businesses_left <= 0:
                 break
-            print(f'business count: {businesses_left}')
+            # print(f'business count: {businesses_left}')
         index += 1
     return {'msg': msg}
 
