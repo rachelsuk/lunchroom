@@ -14,6 +14,11 @@
   src: url("/static/fonts/Karla/Karla-Regular.ttf");
 }
 
+@font-face {
+  font-family: spectral-extralight;
+  src: url("/static/fonts/Spectral/Spectral-ExtraLight.ttf");
+}
+
 body {
   font-family: karla-medium;
   background-color: #0f1a26;
@@ -73,8 +78,20 @@ body {
 #invite-link {
   font-family: spectral-regular;
   margin-bottom: 1em;
-  font-size: 2vw;
+  font-size: 30px;
+  font-size: 2.5vw;
   color: white;
+}
+
+#shared-link {
+  font-size: 25px;
+  font-size: 2vw;
+  font-family: spectral-extralight;
+  text-decoration-line: underline;
+}
+
+#shared-link:hover {
+  color: #fc363b;
 }
 
 #exact-location-btn {
@@ -132,7 +149,7 @@ body {
 }
 
 #provide-your-location {
-  font-family: karla-medium;
+  font-family: karla-regular;
   font-size: 30px;
   font-size: 2.5vw;
 }
@@ -184,12 +201,12 @@ input[type="radio"] {
   display: none;
 }
 
-input[type="radio"]:checked + label {
+input[type="radio"].price:checked + label {
   background-color: #1a6a62;
   color: white;
 }
 
-input[type="radio"]:hover + label {
+input[type="radio"].price:hover + label {
   background-color: #1a6a62;
   color: white;
 }
@@ -224,11 +241,15 @@ input[type="radio"]:hover + label {
 .business-info {
   display: inline-block;
   margin: 1em;
+  vertical-align: middle;
+  line-height: normal;
 }
 
 .business-btns {
   display: inline-block;
   margin: 1em;
+  vertical-align: middle;
+  line-height: normal;
 }
 
 .business-name {
@@ -242,14 +263,26 @@ input[type="radio"]:hover + label {
   color: #fc363b;
 }
 
-.add-restaurant-btn {
+.add-restaurant-to-session-btn {
   color: black;
   background-color: #bfced9;
   border-radius: 15px;
   padding: 5px 15px;
 }
 
-.add-restaurant-btn:hover {
+.add-restaurant-to-session-btn:hover {
+  color: white;
+  background-color: #1a6a62;
+}
+
+.save-restaurant-btn {
+  color: black;
+  background-color: #bfced9;
+  border-radius: 15px;
+  padding: 5px 15px;
+}
+
+.save-restaurant-btn:hover {
   color: white;
   background-color: #1a6a62;
 }
@@ -267,4 +300,123 @@ input[type="radio"]:hover + label {
   border-bottom: 7px solid transparent;
   display: inline-block;
   margin: 0px 5px;
+}
+
+.google-map {
+  margin: auto;
+  width: 50vw;
+  height: 40vw;
+}
+
+#start-quiz-btn {
+  font-size: 2em;
+  font-family: karla-regular;
+}
+
+#start-quiz-btn-container {
+  margin: auto;
+}
+
+#triangle-right-start-quiz {
+  margin: 0px 0px -2px -4px;
+}
+
+#waiting-room-start-heading {
+  font-family: spectral-regular;
+  color: white;
+  font-size: 2.5em;
+  margin: 0.5em;
+}
+
+#minimum-distance {
+  font-size: 1.5em;
+  margin: 0.5em;
+}
+
+#max-distance-field {
+  margin: 5px;
+}
+
+#business-quiz {
+  display: inline-block;
+}
+
+#business-quiz-container {
+  width: 90%;
+}
+
+#google-map-container {
+  display: inline-block;
+}
+
+#google-map-quiz {
+  width: 40vw;
+  height: 30vw;
+}
+
+.business-score-radio-group {
+  display: inline-block;
+  text-align: center;
+  position: relative;
+}
+
+.business-score-radio-group label {
+  display: block;
+  width: 7em;
+}
+
+.business-score-icon {
+  width: 40px;
+  height: 40px;
+  padding: 4px;
+  border-radius: 50%;
+}
+
+input[type="radio"].business-score:checked + label img {
+  background-color: #1a6a62;
+}
+
+input[type="radio"].business-score:hover + label img {
+  background-color: #1a6a62;
+}
+
+#business-score-container {
+  margin: 2em;
+}
+
+input[type="radio"].business-score + label + span {
+  visibility: hidden;
+  width: 120px;
+  background-color: #1a6a62;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 150%;
+  left: 50%;
+  margin-left: -60px;
+  margin-top: -10px;
+}
+
+input[type="radio"].business-score + label + span::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #1a6a62 transparent;
+  margin-top: -10px;
+}
+
+input[type="radio"].business-score:hover + label + span {
+  visibility: visible;
+}
+
+#business-score-label {
+  font-size: 1.5em;
+  margin-bottom: 1.5em;
 }
