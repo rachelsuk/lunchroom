@@ -34,7 +34,7 @@ function WaitingRoomStart(props) {
         const interval = setInterval(() => {
             $.get('/start-quiz.json', (res) => {
                 if (res.started) {
-                    window.location.replace("/quiz");
+                    window.location.assign("/quiz");
                 }
             });
             $.get('/retrieve-users-locations.json', (result) => {
@@ -43,7 +43,7 @@ function WaitingRoomStart(props) {
 
                 savedCallback.current(result.users_locations);
             });
-        }, 300);
+        }, 10000);
         return () => clearInterval(interval);
     }, []);
 
@@ -69,7 +69,7 @@ function WaitingRoomStart(props) {
                             if (res.msg == 'success') {
                                 $.post('/start-quiz.json', (res) => {
                                     if (res.started) {
-                                        window.location.replace("/quiz");
+                                        window.location.assign("/quiz");
                                     }
                                 });
                             }
@@ -90,16 +90,21 @@ function WaitingRoomStart(props) {
 
     return (
         <React.Fragment>
-            {isHost && !started ? <button onClick={startQuiz}>Let's Start!</button> : null}
             {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
-            {started ? (<React.Fragment>
-                <div id="minimum-distance"></div>
-                <form onSubmit={checkDistance} id="max-distance-form">
-                    <label>Maximum Distance: </label>
-                    <input type="text" name="max-distance" id="max-distance-field" />
-                    <input type="submit" />
-                </form></React.Fragment>) : null}
-            <GoogleMap usersLocations={usersLocations} businesses={[]} />
+            <div className='center'>
+                {!started && <div id="waiting-room-start-heading">Waiting for all participants to join..</div>}
+                {started && (<React.Fragment>
+                    <div id="minimum-distance"></div>
+                    <form id="max-distance-form">
+                        <label>Maximum Distance: </label>
+                        <input type="text" name="max-distance" id="max-distance-field" />
+                        <button className="btn submit-btn" onClick={checkDistance}>Submit</button>
+                    </form></React.Fragment>)}
+                <hr />
+                {(isHost && !started) && <div id='start-quiz-btn-container'><button className="btn" id="start-quiz-btn" onClick={startQuiz}>Everyone In? Let's Start!</button><span className="triangle-right" id="triangle-right-start-quiz"></span></div>}
+
+                <GoogleMap usersLocations={usersLocations} businesses={[]} />
+            </div>
         </React.Fragment>
     );
 }
