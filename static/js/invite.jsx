@@ -13,7 +13,7 @@ function Invite(props) {
     React.useEffect(() => {
         $.get('/check-login.json', (res) => {
             if (!res.logged_in) {
-                window.location.replace(`/login?url=${url}`);
+                window.location.assign(`/login?url=${url}`);
             } else {
                 $.get('/check-host.json', (res) => {
                     if (res.is_host) {
@@ -35,7 +35,7 @@ function Invite(props) {
         <React.Fragment>
             {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
             <div id="invite-component" className="center">
-                {isHost && <div id="invite-link"><div>Invite Link:</div><div id="shared-link">{url}</div><button className='btn' onClick={copyLink}>Copy Link</button></div>}
+                {isHost && <div id="invite-link"><div>Share this link with everyone participating:</div><div id="shared-link">{url}</div><button className='btn' onClick={copyLink}>Copy Link</button></div>}
                 <hr />
                 <UserLocationInput setErrorMessage={setErrorMessage} url={url} />
             </div>
