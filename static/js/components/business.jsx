@@ -40,12 +40,10 @@ function Business(props) {
                     </ul>}
                 </div>
                 <div className="business-btns">
-                    {showSaveButton && <button onClick={addToSavedBusinesses}>Add to my saved restaurants.</button>}
-                    {showAddButton && <button className="btn add-restaurant-btn" onClick={addBusiness}>Add Restaurant</button>}
+                    {showSaveButton && <button className="btn save-restaurant-btn" onClick={addToSavedBusinesses}>Add to my saved restaurants</button>}
+                    {showAddButton && <button className="btn add-restaurant-to-session-btn" onClick={addBusiness}>Add Restaurant</button>}
                 </div>
             </div>
-            <hr />
-
         </React.Fragment >
     );
 }
