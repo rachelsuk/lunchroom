@@ -21,11 +21,6 @@ def homepage():
     return render_template('index.html')
 
 
-@app.route('/login')
-def login():
-    return render_template('login.html')
-
-
 @app.route('/check-login.json')
 def check_login():
     logged_in = False
@@ -96,23 +91,29 @@ def start_session():
 def invite(yelphelper_session_id):
     # store yelphelper session id in flask session
     session['yelphelper_session_id'] = yelphelper_session_id
+    return render_template('invite.html')
+
+
+@app.route('/add-user-to-yelphelper-session.json', methods=['POST'])
+def add_user_to_session():
+    yelphelper_session_id = session['yelphelper_session_id']
     if 'user_id' in session:
         # add user to YelpHelperSession by creating UserYelpHelperSession object (middle table)
         user_id = session['user_id']
         user_yelphelper_session = UserYelpHelperSession.query.filter_by(
-            user_id=user_id, yelphelper_session_id=session['yelphelper_session_id']).first()
+            user_id=user_id, yelphelper_session_id=yelphelper_session_id).first()
         if not user_yelphelper_session:
             host_exists = UserYelpHelperSession.query.filter_by(
-                yelphelper_session_id=session['yelphelper_session_id']).first()
+                yelphelper_session_id=yelphelper_session_id).first()
             if not host_exists:
                 user_yelphelper_session = UserYelpHelperSession(
-                    user_id=user_id, yelphelper_session_id=session['yelphelper_session_id'], is_host=True)
+                    user_id=user_id, yelphelper_session_id=yelphelper_session_id, is_host=True)
             else:
                 user_yelphelper_session = UserYelpHelperSession(
-                    user_id=user_id, yelphelper_session_id=session['yelphelper_session_id'])
+                    user_id=user_id, yelphelper_session_id=yelphelper_session_id)
             db.session.add(user_yelphelper_session)
             db.session.commit()
-    return render_template('invite.html')
+    return {'msg': 'success'}
 
 
 @app.route('/invite/<yelphelper_session_id>/criteria-form')
