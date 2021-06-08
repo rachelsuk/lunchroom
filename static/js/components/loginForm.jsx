@@ -9,27 +9,27 @@ function LoginForm(props) {
             'password': document.querySelector('#login-form').elements.password.value
         };
         $.post('/process-login.json', formData, (res) => {
-            
             if (res.message === "success") {
-                props.onSuccess();
+                props.closeModal();
+                props.loggedInSuccess();
             }
             else {
                 setErrorMessage(res.message);
             }
-            
+
         });
 
     }
-    
+
     return (
-        <React.Fragment>
+        <div id="login-container" className='center'>
             {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
             <h2>Login</h2>
-            <form onSubmit={loginHandler} id="login-form">
-                Email <input type="text" name="email" />
-                Password <input type="password" name="password" />
-                <input type="submit" />
+            <form id="login-form" className="login-new-user-form">
+                <div>Email <input type="text" name="email" /></div>
+                <div>Password <input type="password" name="password" /></div>
+                <button className="btn submit-btn btn-border" onClick={loginHandler}>Submit</button>
             </form>
-        </React.Fragment>
+        </div>
     );
 }

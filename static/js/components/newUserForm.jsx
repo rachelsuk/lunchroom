@@ -15,7 +15,8 @@ function NewUserForm(props) {
         };
         $.post('/new-user.json', formData, (res) => {
             if (res.message === 'success') {
-                props.onSuccess();
+                props.closeModal();
+                props.loggedInSuccess();
             }
             else {
                 setErrorMessage(res.message);
@@ -24,17 +25,17 @@ function NewUserForm(props) {
     }
 
     return (
-        <React.Fragment>
+        <div id="new-user-container" className="center">
             {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
             <h2>Create an Account</h2>
-            <form onSubmit={registerUserHandler} id="new-user-form">
-                First Name <input type="text" name="fname" />
-                Last Name <input type="text" name="lname" />
-                Phone Number <input type="text" name="phone" />
-                Email <input type="text" name="email" />
-                Password <input type="password" name="password" />
-                <input type="submit" />
+            <form id="new-user-form" className="login-new-user-form">
+                <div>First Name <input type="text" name="fname" /></div>
+                <div>Last Name <input type="text" name="lname" /></div>
+                <div>Phone Number <input type="text" name="phone" /></div>
+                <div>Email <input type="text" name="email" /></div>
+                <div>Password <input type="password" name="password" /></div>
+                <button className="btn submit-btn btn-border" onClick={registerUserHandler}>Submit</button>
             </form>
-        </React.Fragment>
+        </div>
     );
 }
