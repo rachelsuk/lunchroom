@@ -9,25 +9,25 @@ function CriteriaFormContainer(props) {
     const [isHost, setIsHost] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState(null);
 
-    const url = window.location.href;
+    // const url = window.location.href;
 
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const sharedLink = urlParams.get('url');
 
+    function openModal() {
+        const modal = document.getElementById("login-modal");
+        modal.style.display = 'block';
+    }
+
     React.useEffect(() => {
-        $.get('/check-login.json', (res) => {
-            if (!res.logged_in) {
-                window.location.assign(`/login?url=${url}`);
-            } else {
-                $.get('/check-host.json', (res) => {
-                    if (res.is_host) {
-                        setIsHost(true);
-                    }
-                });
+        $.get('/check-host.json', (res) => {
+            if (res.is_host) {
+                setIsHost(true);
             }
         });
     }, []);
+
 
     function copyLink() {
         const sharedLink = document.querySelector("#shared-link");
@@ -157,7 +157,7 @@ function CriteriaForm(props) {
                 </div>
             </div>
             <hr />
-            <button class="btn" id="go-to-waiting-room-btn" onClick={redirectWaitingRoomStart}>I'm finished. Continue to waiting room <span className="triangle-right"></span></button>
+            <button className="btn" id="go-to-waiting-room-btn" onClick={redirectWaitingRoomStart}>I'm finished. Continue to waiting room <span className="triangle-right"></span></button>
         </React.Fragment>
     );
 }
