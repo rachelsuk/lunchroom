@@ -3,6 +3,8 @@ function Business(props) {
     const showSaveButton = props.showSaveButton;
     const setErrorMessage = props.setErrorMessage;
     const showAddButton = props.showAddButton;
+    const showBusinessRanking = props.showBusinessRanking;
+    const businessIndex = props.businessIndex;
 
     function addToSavedBusinesses() {
         $.post('/add-to-saved-businesses.json', { 'business-alias': business.alias }, (res) => {
@@ -28,9 +30,11 @@ function Business(props) {
 
     return (
         <React.Fragment>
-            <div className="business-container" id={business.saved_business_id}>
+            <div className="business-container" id={'business-id-' + business.saved_business_id}>
                 <div className="business-info">
-                    <a className='business-name' id={'business-name' + business.alias} href={business.url} target="_blank">{business.name}</a>
+                    <a className='business-name' id={'business-name-' + business.alias} href={business.url} target="_blank">
+                        {showBusinessRanking && <span>{businessIndex + 1}. </span>}
+                        {business.name}</a>
                     <div>
                         <img src={`${business.image_url}`} width="200" height="200" />
                     </div>
