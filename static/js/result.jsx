@@ -17,9 +17,7 @@ function ResultsContainer(props) {
     for (const business of businessesResults) {
         businessesInfo.push(
             <div className="business" key={business.alias}>
-                <h2>{businessIndex + 1}.</h2>
-                <Business business={business} showSaveButton={true} setErrorMessage={setErrorMessage} />
-                <p>{business.total_score}</p>
+                <Business business={business} showSaveButton={true} showBusinessRanking={true} setErrorMessage={setErrorMessage} businessIndex={businessIndex} />
             </div>
         );
     }
@@ -34,12 +32,18 @@ function ResultsContainer(props) {
     const url = window.location.href;
     return (
         <React.Fragment>
-            <Header url={url} />
+            <Header />
             {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
-            <GoogleMap businesses={businessesResults} usersLocations={usersLocations} />
-            {businessesInfo ? <div>{businessesInfo[businessIndex]}</div> : null}
-            {businessIndex != 0 ? <button onClick={showPreviousBusiness}>Back</button> : null}
-            {businessIndex < (businessesInfo.length - 1) ? <button onClick={showNextBusiness}>Next</button> : null}
+            <div id="result-container" className="center">
+                <div id="google-map-result" className="google-map-container">
+                    {/* <GoogleMap businesses={businessesResults} usersLocations={usersLocations} /> */}
+                </div>
+                <div className="business-result-container">
+                    {businessesInfo ? <div>{businessesInfo[businessIndex]}</div> : null}
+                    {businessIndex != 0 && <button className="btn prev-next-btns" onClick={showPreviousBusiness}>&laquo; Previous</button>}
+                    {businessIndex < (businessesInfo.length - 1) && <button className="btn prev-next-btns" onClick={showNextBusiness}>Next &raquo;</button>}
+                </div>
+            </div>
         </React.Fragment>
     )
 }
