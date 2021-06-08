@@ -1,4 +1,8 @@
 /* https://www.fontpair.co/pairing/spectral-and-karla */
+/* https://www.tutorialrepublic.com/html-reference/html-color-picker.php */
+/* https://www.vecteezy.com/account/dashboard */
+/* https://www.vecteezy.com/members/joezhuang?utf8=%E2%9C%93&search=lunch&sort_by=popular */
+
 @font-face {
   font-family: karla-medium;
   src: url("/static/fonts/Karla/Karla-Medium.ttf");
@@ -563,4 +567,21 @@ input[type="radio"].business-score:hover + label + span {
 
 .login-new-user-form {
   margin: 1em;
+}
+
+#homepage-blob-img {
+  position: absolute;
+  /* left: 0px;
+    top: 0px; */
+  z-index: -1;
+}
+
+#homepage-table-img {
+  position: absolute;
+  width: 55em;
+  height: 55em;
+  margin-top: -4em;
+  transform: rotate(5deg);
+  /* left: 40px;
+    top: 10px; */
 }
