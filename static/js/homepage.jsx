@@ -1,15 +1,13 @@
 function Homepage(props) {
 
-    const url = window.location.href;
-
     return (
         <React.Fragment>
-            <Header url={url} isHomepage={true} />
+            <Header isHomepage={true} />
             <div className="container">
                 <div className="row">
                     <div className="col-12 col-md-6" id="homepage-main-div">
                         <h1 id="homepage-brand">LunchRoom</h1>
-                        <a className="btn" id="start-link" href="/start-session">Start A Session</a>
+                        <a className="btn" id="start-link" href="/start-session">Start A Session<span className="arrow right"></span></a>
 
                     </div>
                     <div id="homepage-blob" className="col-md-6 d-none d-lg-block">
