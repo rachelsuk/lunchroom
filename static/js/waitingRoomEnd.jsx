@@ -13,7 +13,7 @@ function WaitingRoomEnd(props) {
 
     }, [])
 
-    return (<div>Waiting for all participants to finish...</div>)
+    return (<div id="waiting-finish-heading" className='center'>Waiting for all participants to finish...</div>)
 }
 
 ReactDOM.render(
