@@ -29,6 +29,10 @@ body {
   margin-bottom: 5em;
 }
 
+h2 {
+  font-family: spectral-regular;
+}
+
 .btn {
   font-family: karla-medium;
   color: white;
@@ -40,7 +44,7 @@ body {
 
 #homepage-brand {
   font-family: spectral-regular;
-  font-size: 7em;
+  font-size: 8em;
   color: white;
 }
 
@@ -54,12 +58,15 @@ body {
 
 #start-link {
   margin-left: 1em;
-  font-size: 1.5em;
+  font-size: 1.25em;
   color: white;
+  background-color: #fc363b;
+  border-radius: 30px;
+  padding: 10px 30px;
 }
 
 #start-link:hover {
-  color: #fc363b;
+  background-color: #1a6a62;
 }
 
 #navbar-brand {
@@ -163,6 +170,17 @@ body {
   margin-bottom: 2em;
 }
 
+/* #start-link .triangle-right {
+  border-left: 20px solid white;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  margin: 0px 0px -4px 10px;
+} */
+
+#start-link .arrow {
+  margin: 5px 0px 2px 5px;
+}
+
 #criteria-form {
   margin: 2em;
 }
@@ -173,6 +191,18 @@ body {
 
 input[type="text"] {
   border-radius: 4px;
+  padding: 4px 8px;
+  margin: 5px;
+  width: 250px;
+  text-align: center;
+}
+
+input[type="password"] {
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: 5px;
+  width: 250px;
+  text-align: center;
 }
 
 #choose-saved-businesses {
@@ -228,6 +258,11 @@ input[type="radio"].price:hover + label {
   margin: 0.5em 0.2em 0.2em 0.5em;
 }
 
+.right {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+
 .up {
   transform: rotate(-135deg);
   -webkit-transform: rotate(-135deg);
@@ -235,7 +270,7 @@ input[type="radio"].price:hover + label {
 }
 
 .business-container {
-  margin: 2em;
+  margin: -1em 2em 2em 2em;
 }
 
 .business-info {
@@ -339,14 +374,18 @@ input[type="radio"].price:hover + label {
 
 #business-quiz {
   display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
 }
 
 #business-quiz-container {
   width: 90%;
 }
 
-#google-map-container {
+.google-map-container {
   display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
 }
 
 #google-map-quiz {
@@ -419,4 +458,109 @@ input[type="radio"].business-score:hover + label + span {
 #business-score-label {
   font-size: 1.5em;
   margin-bottom: 1.5em;
+}
+
+#waiting-finish-heading {
+  font-family: spectral-regular;
+  font-size: 2.5em;
+}
+
+.business-result-container {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  margin: 1em;
+}
+
+#result-container {
+  width: 90%;
+}
+
+#google-map-result .google-map {
+  width: 40vw;
+  height: 30vw;
+  margin: 0;
+}
+
+.prev-next-btns {
+  text-decoration: none;
+  background-color: #fc363b;
+  color: white;
+  border-radius: 60%;
+  margin: 10px;
+}
+
+.prev-next-btns:hover {
+  background-color: #1a6a62;
+  color: white;
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #bfced9;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 35%; /* Could be more or less, depending on screen size */
+  min-width: 500px;
+  color: black;
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#login-container {
+  margin-top: 0%;
+  /* width: 80%; */
+}
+
+#new-user-container {
+  margin-top: 0%;
+}
+
+#login-new-user-toggle-btn {
+  color: black;
+}
+
+#login-new-user-toggle-btn:hover {
+  color: #fc363b;
+}
+
+.btn-border {
+  border-color: #0f1a26;
+  border-width: thin;
+}
+
+.btn-border:hover {
+  border: none;
+}
+
+.login-new-user-form {
+  margin: 1em;
 }
