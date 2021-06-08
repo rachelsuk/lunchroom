@@ -10,16 +10,17 @@ function Invite(props) {
 
     const url = window.location.href;
 
+    function openModal() {
+        const modal = document.getElementById("login-modal");
+        modal.style.display = 'block';
+    }
+
     React.useEffect(() => {
         $.get('/check-login.json', (res) => {
             if (!res.logged_in) {
-                window.location.assign(`/login?url=${url}`);
+                openModal();
             } else {
-                $.get('/check-host.json', (res) => {
-                    if (res.is_host) {
-                        setIsHost(true);
-                    }
-                });
+                loggedInSuccess();
             }
         });
     }, []);
@@ -31,9 +32,22 @@ function Invite(props) {
         setErrorMessage("Link has been copied")
     }
 
+    const loggedInSuccess = () => {
+        $.post('/add-user-to-yelphelper-session.json', (res) => {
+            if (res.msg == "success") {
+                $.get('/check-host.json', (res) => {
+                    if (res.is_host) {
+                        setIsHost(true);
+                    }
+                });
+            }
+        });
+    }
+
     return (
         <React.Fragment>
             {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
+            <Login noCloseBtn={true} loggedInSuccess={loggedInSuccess} />
             <div id="invite-component" className="center">
                 {isHost && <div id="invite-link"><div>Share this link with everyone participating:</div><div id="shared-link">{url}</div><button className='btn' onClick={copyLink}>Copy Link</button></div>}
                 <hr />

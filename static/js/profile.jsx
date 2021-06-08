@@ -6,10 +6,10 @@ function Profile(props) {
             setSavedBusinesses(res.saved_businesses);
         })
     }, []);
-    const url = window.location.href;
+    // const url = window.location.href;
     return (
         <React.Fragment>
-            <Header url={url} />
+            <Header />
             {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
             {savedBusinesses.length > 0 ? <SavedBusinesses savedBusinesses={savedBusinesses} setSavedBusinesses={setSavedBusinesses} setErrorMessage={setErrorMessage} /> : <div>no saved businesses</div>}
         </React.Fragment>
