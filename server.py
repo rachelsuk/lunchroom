@@ -195,18 +195,18 @@ def retrieve_users_locations():
     return {"users_locations": users_locations}
 
 
-@app.route('/check-distance.json')
-def check_distance():
+@app.route('/check-duration.json')
+def check_duration():
     yelphelper_session_id = session['yelphelper_session_id']
     yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
-    max_distance = float(request.args.get('max-distance'))
-    print(max_distance)
+    max_duration = float(request.args.get('max-duration'))
+    print(max_duration)
 
     users_locations = crud.get_users_locations(yelphelper_session_id)
-    response = distance_matrix_api.check_distance(
-        users_locations, max_distance)
+    response = distance_matrix_api.check_duration(
+        users_locations, max_duration)
     if response["msg"] == "success":
-        yelphelper_session.max_distance = max_distance
+        yelphelper_session.max_duration = max_duration
         db.session.add(yelphelper_session)
         db.session.commit()
 
@@ -221,7 +221,7 @@ def retrieve_businesses():
     center_point = distance_matrix_api.find_center_point(users_locations)
     # print(
     #     f'center point: {center_point.get("lat")}, {center_point.get("lng")}')
-    max_distance = yelphelper_session.max_distance
+    max_duration = yelphelper_session.max_duration
     search_criterias = yelphelper_session.search_criterias
     yelp_api_responses = {}
     longest_list = 0
@@ -234,8 +234,8 @@ def retrieve_businesses():
                 "latitude"), "lng": business.get("coordinates").get("longitude")})
         print(businesses_locations)
         print(len(businesses_locations))
-        indices_to_remove = distance_matrix_api.check_below_max_distance(
-            users_locations, businesses_locations, max_distance)
+        indices_to_remove = distance_matrix_api.check_below_max_duration(
+            users_locations, businesses_locations, max_duration)
         for index in sorted(list(indices_to_remove), reverse=True):
             del businesses[index]
         yelp_api_responses[search_criteria.search_criteria_id] = businesses
@@ -250,8 +250,8 @@ def retrieve_businesses():
         for business in businesses:
             businesses_locations.append({"lat": business.get("coordinates").get(
                 "latitude"), "lng": business.get("coordinates").get("longitude")})
-        indices_to_remove = distance_matrix_api.check_below_max_distance(
-            users_locations, businesses_locations, max_distance)
+        indices_to_remove = distance_matrix_api.check_below_max_duration(
+            users_locations, businesses_locations, max_duration)
         for index in sorted(list(indices_to_remove), reverse=True):
             del businesses[index]
         yelp_api_responses[1] = businesses

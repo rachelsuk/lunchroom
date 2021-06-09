@@ -9,7 +9,7 @@ def return_distances(origins, destinations):
     url = "https://maps.googleapis.com/maps/api/distancematrix/json"
 
     payload = {"units": "imperial", "origins": orig_str, "destinations": dest_str,
-               "key": "AIzaSyBK2MfjfGqyN9RhjvbXtMK369AX5uKGTfw"}
+               "departure_time": "now", "key": "AIzaSyBK2MfjfGqyN9RhjvbXtMK369AX5uKGTfw"}
 
     response = requests.request(
         "GET", url, params=payload).json()
@@ -32,41 +32,40 @@ def create_locations_string(locations):
     return locations_str
 
 
-def check_distance(users_locations, max_distance):
+def check_duration(users_locations, max_duration):
     response = return_distances(users_locations, users_locations)
     rows = response.get("rows")
 
     msg = "success"
 
-    min_max_distance = (rows[0].get('elements'))[
-        0].get("distance").get("value")
+    min_max_duration = (rows[0].get('elements'))[
+        0].get("duration").get("value")
 
     for row in rows:
         elements = row.get("elements")
         for element in elements:
-            meters = element.get("distance").get("value")
-            miles = convert_meters_to_miles(meters)
-            if max_distance < (miles/2):
+            seconds = element.get("duration").get("value")
+            minutes = seconds/60
+            if max_duration < (minutes/2):
                 msg = "fail"
-            if (miles/2) > min_max_distance:
-                min_max_distance = miles/2
+            if (minutes/2) > min_max_duration:
+                min_max_duration = minutes/2
 
-    return {"msg": msg, "min_max_distance": min_max_distance}
+    return {"msg": msg, "min_max_duration": min_max_duration}
 
 
-def check_below_max_distance(users_locations, businesses_locations, max_distance):
+def check_below_max_duration(users_locations, businesses_locations, max_duration):
     response = return_distances(users_locations, businesses_locations)
     rows = response.get("rows")
     indices_to_remove = set()
     for row in rows:
         elements = row.get("elements")
         for index, element in enumerate(elements):
-            meters = element.get("distance").get("value")
-            miles = convert_meters_to_miles(meters)
-            if max_distance < miles:
-                print(f'{miles} miles. deleting index {index}')
+            meters = element.get("duration").get("value")
+            minutes = seconds/60
+            if max_duration < minutes:
+                print(f'{minutes} minutes. deleting index {index}')
                 indices_to_remove.add(index)
-
     return indices_to_remove
 
 

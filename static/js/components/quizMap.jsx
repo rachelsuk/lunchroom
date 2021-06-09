@@ -9,6 +9,7 @@ function QuizGoogleMap(props) {
     const usersLocations = props.usersLocations;
     const [businessMarker, setBusinessMarker] = React.useState(null);
     const [userMarker, setUserMarker] = React.useState(null);
+    const [duration, setDuration] = React.useState(null);
     const [distance, setDistance] = React.useState(null);
     const [distanceResponse, setDistanceResponse] = React.useState(null);
     const savedCallback = React.useRef();
@@ -24,7 +25,8 @@ function QuizGoogleMap(props) {
 
     React.useEffect(() => {
         if (userMarker && businessMarker) {
-            setDistance(findDistance(userMarker.index, businessMarker.index));
+            setDuration(findDistance(userMarker.index, businessMarker.index).durationMinutes);
+            setDistance(findDistance(userMarker.index, businessMarker.index).distanceMiles);
         }
         savedCallback.current = markerCallback;
     }, [userMarker, businessMarker])
@@ -114,7 +116,7 @@ function QuizGoogleMap(props) {
         googleMap.panToBounds(bounds);
 
         return function cleanup() {
-            setDistance(null);
+            setDuration(null);
             setBusinessMarker(null);
             setUserMarker(null);
         };
@@ -123,16 +125,18 @@ function QuizGoogleMap(props) {
 
 
     function findDistance(user_index, business_index) {
-        let distance_meters = ((distanceResponse.rows[user_index]).elements[business_index]).distance.value;
-        let distance_miles = distance_meters * 0.000621371
-        return distance_miles
-
+        let durationSeconds = ((distanceResponse.rows[user_index]).elements[business_index]).duration.value;
+        let durationMinutes = durationSeconds / 60
+        let distanceMeters = ((distanceResponse.rows[user_index]).elements[business_index]).distance.value;
+        let distanceMiles = distanceMeters * 0.000621371
+        return { 'durationMinutes': durationMinutes, 'distanceMiles': distanceMiles }
     }
 
     return (
         <React.Fragment>
-            {distance ? <div id="distance">Distance from {userMarker.name} to {businessMarker.name}: {distance} miles.</div> : null}
+            {duration && <div id="distance">Driving duration from {userMarker.name} to {businessMarker.name}: {Number((duration).toFixed(0))} minutes ({Number((distance).toFixed(1))} miles).</div>}
             <div id="google-map-quiz" className="google-map" />
         </React.Fragment>
     )
 }
+

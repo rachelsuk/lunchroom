@@ -33,7 +33,7 @@ class YelpHelperSession(db.Model):
     date = db.Column(db.Text, nullable=False)
     started = db.Column(db.Boolean, default=False)
     completed = db.Column(db.Boolean, default=False)
-    max_distance = db.Column(db.Float)
+    max_duration = db.Column(db.Float)
     distance_matrix = db.Column(JSON)
     users = db.relationship("User",
                             secondary="users_yelphelper_sessions",
