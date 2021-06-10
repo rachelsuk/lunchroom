@@ -11,6 +11,7 @@ import geocoding_api
 import distance_matrix_api
 from datetime import datetime
 import os
+import itertools
 
 app = Flask(__name__)
 app.secret_key = os.environ['APP_KEY']
@@ -200,7 +201,6 @@ def check_duration():
     yelphelper_session_id = session['yelphelper_session_id']
     yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
     max_duration = float(request.args.get('max-duration'))
-    print(max_duration)
 
     users_locations = crud.get_users_locations(yelphelper_session_id)
     response = distance_matrix_api.check_duration(
@@ -219,66 +219,54 @@ def retrieve_businesses():
     yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
     users_locations = crud.get_users_locations(yelphelper_session_id)
     center_point = distance_matrix_api.find_center_point(users_locations)
-    # print(
-    #     f'center point: {center_point.get("lat")}, {center_point.get("lng")}')
     max_duration = yelphelper_session.max_duration
     search_criterias = yelphelper_session.search_criterias
-    yelp_api_responses = {}
-    longest_list = 0
+    yelp_api_responses = []
     for search_criteria in search_criterias:
         businesses = yelp_api.business_search(
             center_point.get("lat"), center_point.get("lng"), search_criteria.term, search_criteria.price)
-        businesses_locations = []
-        for business in businesses:
-            businesses_locations.append({"lat": business.get("coordinates").get(
-                "latitude"), "lng": business.get("coordinates").get("longitude")})
-        print(businesses_locations)
-        print(len(businesses_locations))
-        indices_to_remove = distance_matrix_api.check_below_max_duration(
-            users_locations, businesses_locations, max_duration)
-        for index in sorted(list(indices_to_remove), reverse=True):
-            del businesses[index]
-        yelp_api_responses[search_criteria.search_criteria_id] = businesses
-        if len(businesses) > longest_list:
-            longest_list = len(businesses)
-        print(yelp_api_responses)
+        yelp_api_responses.append(businesses)
+
+    all_businesses = list(
+        map(list, itertools.zip_longest(* yelp_api_responses, fillvalue=None)))
+
+    all_businesses = sum(all_businesses, [])
+    all_businesses = [x for x in all_businesses if x is not None]
 
     if len(search_criterias) == 0:
         businesses = yelp_api.business_search(
-            center_point.get("lat"), center_point.get("lng"))
-        businesses_locations = []
-        for business in businesses:
-            businesses_locations.append({"lat": business.get("coordinates").get(
-                "latitude"), "lng": business.get("coordinates").get("longitude")})
-        indices_to_remove = distance_matrix_api.check_below_max_duration(
-            users_locations, businesses_locations, max_duration)
-        for index in sorted(list(indices_to_remove), reverse=True):
-            del businesses[index]
-        yelp_api_responses[1] = businesses
-        if len(businesses) > longest_list:
-            longest_list = len(businesses)
+            center_point.get("lat"), center_point.get("lng"), 'food')
+        all_businesses = businesses
 
+    if len(all_businesses) >= 25:
+        businesses_batch = all_businesses[:25]
+        all_businesses[:25] = []
+    else:
+        businesses_batch = all_businesses
+        all_businesses = []
+
+    businesses_locations = []
+    for business in businesses_batch:
+        businesses_locations.append({"lat": business.get("coordinates").get(
+            "latitude"), "lng": business.get("coordinates").get("longitude")})
+
+    distance_matrix_response = distance_matrix_api.return_distances(
+        businesses_locations, users_locations)
+
+    # print(distance_matrix_response)
     existing_businesses_count = len(yelphelper_session.businesses)
     businesses_left = 10 - existing_businesses_count
-    index = 0
     msg = "success"
-    # print(f'starting business count: {businesses_left}')
-    # print(yelphelper_session.businesses)
     while businesses_left > 0:
-        if index >= longest_list:
-            msg = "fail"
-            businesses_left = 0
-        for api_response in yelp_api_responses.values():
-            try:
-                # print(api_response)
-                # print(f'index {index}')
-                business = api_response[index]
-                alias = business.get("alias")
-                business_already_added = db.session.query(Business).filter_by(
-                    yelphelper_session=yelphelper_session, alias=alias).first()
-                if not business_already_added:
+        for index, business in enumerate(businesses_batch):
+            alias = business.get("alias")
+            business_already_added = db.session.query(Business).filter_by(
+                yelphelper_session=yelphelper_session, alias=alias).first()
+            if not business_already_added:
+                meet_duration_criteria = distance_matrix_api.check_below_max_duration(
+                    distance_matrix_response, index, max_duration)
+                if meet_duration_criteria:
                     name = business.get("name")
-                    # print(name)
                     yelp_id = business.get("id")
                     image_url = business.get("image_url")
                     url = business.get("url")
@@ -300,13 +288,113 @@ def retrieve_businesses():
                     db.session.add(new_business)
                     db.session.commit()
                     businesses_left -= 1
-            except IndexError:
-                pass
+                    print(businesses_left)
             if businesses_left <= 0:
                 break
-            # print(f'business count: {businesses_left}')
-        index += 1
+        if len(all_businesses) >= 25:
+            businesses_batch = all_businesses[:25]
+            all_businesses[:25] = []
+        elif 25 > len(all_businesses) > 0:
+            businesses_batch = all_businesses
+            all_businesses = []
+        else:
+            msg = "fail"
+            break
+
+        businesses_locations = []
+        for business in businesses_batch:
+            businesses_locations.append({"lat": business.get("coordinates").get(
+                "latitude"), "lng": business.get("coordinates").get("longitude")})
+
+        distance_matrix_response = distance_matrix_api.return_distances(
+            businesses_locations, users_locations)
+
     return {'msg': msg}
+
+
+# @app.route('/retrieve-businesses-1.json', methods=['POST'])
+# def retrieve_businesses_1():
+#     yelphelper_session_id = session['yelphelper_session_id']
+#     yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
+#     users_locations = crud.get_users_locations(yelphelper_session_id)
+#     center_point = distance_matrix_api.find_center_point(users_locations)
+#     max_duration = yelphelper_session.max_duration
+#     search_criterias = yelphelper_session.search_criterias
+#     yelp_api_responses = {}
+#     longest_list = 0
+#     for search_criteria in search_criterias:
+#         businesses = yelp_api.business_search(
+#             center_point.get("lat"), center_point.get("lng"), search_criteria.term, search_criteria.price)
+#         businesses_locations = []
+#         for business in businesses:
+#             businesses_locations.append({"lat": business.get("coordinates").get(
+#                 "latitude"), "lng": business.get("coordinates").get("longitude")})
+#         indices_to_remove = distance_matrix_api.check_below_max_duration(
+#             users_locations, businesses_locations, max_duration)
+#         for index in sorted(list(indices_to_remove), reverse=True):
+#             del businesses[index]
+#         yelp_api_responses[search_criteria.search_criteria_id] = businesses
+#         if len(businesses) > longest_list:
+#             longest_list = len(businesses)
+
+#     if len(search_criterias) == 0:
+#         businesses = yelp_api.business_search(
+#             center_point.get("lat"), center_point.get("lng"))
+#         businesses_locations = []
+#         for business in businesses:
+#             businesses_locations.append({"lat": business.get("coordinates").get(
+#                 "latitude"), "lng": business.get("coordinates").get("longitude")})
+#         indices_to_remove = distance_matrix_api.check_below_max_duration(
+#             users_locations, businesses_locations, max_duration)
+#         for index in sorted(list(indices_to_remove), reverse=True):
+#             del businesses[index]
+#         yelp_api_responses[1] = businesses
+#         if len(businesses) > longest_list:
+#             longest_list = len(businesses)
+
+#     existing_businesses_count = len(yelphelper_session.businesses)
+#     businesses_left = 10 - existing_businesses_count
+#     index = 0
+#     msg = "success"
+#     while businesses_left > 0:
+#         if index >= longest_list:
+#             msg = "fail"
+#             businesses_left = 0
+#         for api_response in yelp_api_responses.values():
+#             try:
+#                 business = api_response[index]
+#                 alias = business.get("alias")
+#                 business_already_added = db.session.query(Business).filter_by(
+#                     yelphelper_session=yelphelper_session, alias=alias).first()
+#                 if not business_already_added:
+#                     name = business.get("name")
+#                     yelp_id = business.get("id")
+#                     image_url = business.get("image_url")
+#                     url = business.get("url")
+#                     review_count = business.get("review_count")
+#                     yelp_rating = business.get("rating")
+#                     if business.get("price"):
+#                         price = len(business.get("price"))
+#                     else:
+#                         price = None
+#                     address = business.get("location").get("display_address")
+#                     lat = business.get("coordinates").get("latitude")
+#                     lng = business.get("coordinates").get("longitude")
+#                     new_business = Business(yelp_id=yelp_id, alias=alias, name=name, image_url=image_url,
+#                                             url=url, review_count=review_count,
+#                                             yelp_rating=yelp_rating, price=price,
+#                                             address=address,
+#                                             lat=lat, lng=lng,
+#                                             yelphelper_session_id=yelphelper_session_id)
+#                     db.session.add(new_business)
+#                     db.session.commit()
+#                     businesses_left -= 1
+#             except IndexError:
+#                 pass
+#             if businesses_left <= 0:
+#                 break
+#         index += 1
+#     return {'msg': msg}
 
 
 @app.route('/quiz')
@@ -475,7 +563,6 @@ def add_saved_business_to_yp_session():
     saved_business = SavedBusiness.query.get(saved_business_id)
     yelp_id = saved_business.business.yelp_id
     business = yelp_api.business_details(yelp_id)
-    print(business)
     yp_session_businesses = crud.get_businesses_by_yelphelper_session_id(
         yelphelper_session_id)
     msg = 'success'

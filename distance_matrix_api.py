@@ -54,7 +54,20 @@ def check_duration(users_locations, max_duration):
     return {"msg": msg, "min_max_duration": min_max_duration}
 
 
-def check_below_max_duration(users_locations, businesses_locations, max_duration):
+def check_below_max_duration(distance_matrix_response, business_index, max_duration):
+    rows = distance_matrix_response.get("rows")
+    business_row = rows[business_index]
+    business_elements = business_row.get("elements")
+
+    for element in business_elements:
+        seconds = element.get("duration").get("value")
+        minutes = seconds/60
+        if max_duration < minutes:
+            return False
+    return True
+
+
+def check_below_max_duration_1(users_locations, businesses_locations, max_duration):
     response = return_distances(users_locations, businesses_locations)
     rows = response.get("rows")
     indices_to_remove = set()
