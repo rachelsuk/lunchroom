@@ -5,9 +5,9 @@
 function WaitingRoomStart(props) {
     const [isHost, setIsHost] = React.useState(false);
     const [usersLocations, setUsersLocations] = React.useState([]);
-    const [errorMessage, setErrorMessage] = React.useState(null);
     const [started, setStarted] = React.useState(false);
     const savedCallback = React.useRef();
+    const errorMsgRef = React.useRef();
 
     function callback(users_locations) {
         // why users_locations != usersLocations doesn't work?
@@ -62,7 +62,7 @@ function WaitingRoomStart(props) {
 
         $.get('/check-duration.json', durationData, (res) => {
             if (res.msg == "success") {
-                setErrorMessage("Maximum duration has been accepted!");
+                errorMsgRef.current.showErrorMessage("Maximum duration has been accepted!");
                 $.post('/retrieve-businesses.json', (res) => {
                     if (res.msg == 'success') {
                         $.post('/save-distances.json', (res) => {
@@ -76,13 +76,13 @@ function WaitingRoomStart(props) {
                         });
 
                     } else if (res.msg == "fail") {
-                        setErrorMessage('Not enough restaurants within the driving duration range. Try a larger maximum driving duration.')
+                        errorMsgRef.current.showErrorMessage('Not enough restaurants within the driving duration range. Try a larger maximum driving duration.')
                     }
 
                 })
 
             } else if (res.msg == "fail") {
-                setErrorMessage(`Invalid maximum duration. Maximum duration must at least ${res.min_max_duration} miles.`)
+                errorMsgRef.current.showErrorMessage(`Invalid maximum duration. Maximum duration must at least ${res.min_max_duration} miles.`)
             }
         });
 
@@ -90,7 +90,7 @@ function WaitingRoomStart(props) {
 
     return (
         <React.Fragment>
-            {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
+            <ErrorMessage ref={errorMsgRef} />
             <div className='center'>
                 {!started && <div id="waiting-room-start-heading">Waiting for all participants to join..</div>}
                 {started && (<React.Fragment>

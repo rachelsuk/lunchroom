@@ -1,7 +1,6 @@
 function Business(props) {
     const business = props.business;
     const showSaveButton = props.showSaveButton;
-    const setErrorMessage = props.setErrorMessage;
     const showAddButton = props.showAddButton;
     const showBusinessRanking = props.showBusinessRanking;
     const businessIndex = props.businessIndex;
@@ -9,21 +8,20 @@ function Business(props) {
     function addToSavedBusinesses() {
         $.post('/add-to-saved-businesses.json', { 'business-alias': business.alias }, (res) => {
             if (res.msg == "success") {
-                setErrorMessage("Business has been added to your saved businesses.")
+                props.errorMsgRef.current.showErrorMessage("Business has been added to your saved businesses.")
             } else if (res.msg == "already entered") {
-                setErrorMessage("Business was already previously added.")
+                props.errorMsgRef.current.showErrorMessage("Business was already previously added.")
             }
         })
     }
 
 
     function addBusiness(evt) {
-        let id = evt.target.parentElement.parentElement.id
-        $.post('/add-saved-business-to-yp-session.json', { 'saved-business-id': id }, (res) => {
+        $.post('/add-saved-business-to-yp-session.json', { 'saved-business-id': business.saved_business_id }, (res) => {
             if (res.msg == "success") {
-                props.setErrorMessage("Business has been added to the session.")
+                props.errorMsgRef.current.showErrorMessage("Business has been added to the session.")
             } else if (res.msg == "already added") {
-                props.setErrorMessage("Business has already been added to the session.")
+                props.errorMsgRef.current.showErrorMessage("Business has already been added to the session.")
             }
         });
     }

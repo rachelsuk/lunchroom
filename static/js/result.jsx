@@ -2,7 +2,7 @@ function ResultsContainer(props) {
     const [businessesResults, setBusinessesResults] = React.useState([]);
     const [usersLocations, setUsersLocations] = React.useState([]);
     const [businessIndex, setBusinessIndex] = React.useState(0);
-    const [errorMessage, setErrorMessage] = React.useState(null);
+    const errorMsgRef = React.useRef();
     const businessesInfo = [];
 
     React.useEffect(() => {
@@ -17,7 +17,7 @@ function ResultsContainer(props) {
     for (const business of businessesResults) {
         businessesInfo.push(
             <div className="business" key={business.alias}>
-                <Business business={business} showSaveButton={true} showBusinessRanking={true} setErrorMessage={setErrorMessage} businessIndex={businessIndex} />
+                <Business business={business} showSaveButton={true} showBusinessRanking={true} errorMsgRef={errorMsgRef} businessIndex={businessIndex} />
             </div>
         );
     }
@@ -33,13 +33,13 @@ function ResultsContainer(props) {
     return (
         <React.Fragment>
             <Header />
-            {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
+            <ErrorMessage ref={errorMsgRef} />
             <div id="result-container" className="center">
                 <div id="google-map-result" className="google-map-container">
-                    {/* <GoogleMap businesses={businessesResults} usersLocations={usersLocations} /> */}
+                    <GoogleMap businesses={businessesResults} usersLocations={usersLocations} />
                 </div>
                 <div className="business-result-container">
-                    {businessesInfo ? <div>{businessesInfo[businessIndex]}</div> : null}
+                    {businessesInfo && <div>{businessesInfo[businessIndex]}</div>}
                     {businessIndex != 0 && <button className="btn prev-next-btns" onClick={showPreviousBusiness}>&laquo; Previous</button>}
                     {businessIndex < (businessesInfo.length - 1) && <button className="btn prev-next-btns" onClick={showNextBusiness}>Next &raquo;</button>}
                 </div>

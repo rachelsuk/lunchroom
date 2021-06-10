@@ -1,6 +1,6 @@
 function Profile(props) {
     const [savedBusinesses, setSavedBusinesses] = React.useState([])
-    const [errorMessage, setErrorMessage] = React.useState(null);
+    const errorMsgRef = React.useRef();
     React.useEffect(() => {
         $.get('/get-saved-businesses.json', (res) => {
             setSavedBusinesses(res.saved_businesses);
@@ -10,8 +10,8 @@ function Profile(props) {
     return (
         <React.Fragment>
             <Header />
-            {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
-            {savedBusinesses.length > 0 ? <SavedBusinesses savedBusinesses={savedBusinesses} setSavedBusinesses={setSavedBusinesses} setErrorMessage={setErrorMessage} /> : <div>no saved businesses</div>}
+            <ErrorMessage ref={errorMsgRef} />
+            {savedBusinesses.length > 0 ? <SavedBusinesses savedBusinesses={savedBusinesses} setSavedBusinesses={setSavedBusinesses} errorMsgRef={errorMsgRef} /> : <div>no saved businesses</div>}
         </React.Fragment>
     );
 }
@@ -19,14 +19,13 @@ function Profile(props) {
 function SavedBusinesses(props) {
     const savedBusinesses = props.savedBusinesses;
     const setSavedBusinesses = props.setSavedBusinesses;
-    const setErrorMessage = props.setErrorMessage;
     const businessesInfo = [];
 
     function removeBusiness(evt) {
         let id = evt.target.parentElement.id
         $.post('/remove-saved-business.json', { 'saved-business-id': id }, (res) => {
             if (res.msg == "success") {
-                setErrorMessage("Business has been removed from saved businesses.")
+                props.errorMsgRef.current.showErrorMessage("Business has been removed from saved businesses.")
                 $.get('/get-saved-businesses.json', (res) => {
                     setSavedBusinesses(res.saved_businesses);
                 })

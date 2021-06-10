@@ -1,5 +1,5 @@
 function LoginForm(props) {
-    const [errorMessage, setErrorMessage] = React.useState(null);
+    const errorMsgRef = React.useRef();
 
     function loginHandler(evt) {
         evt.preventDefault();
@@ -14,7 +14,8 @@ function LoginForm(props) {
                 props.loggedInSuccess();
             }
             else {
-                setErrorMessage(res.message);
+                errorMsgRef.current.showErrorMessage(res.message);
+
             }
 
         });
@@ -22,14 +23,16 @@ function LoginForm(props) {
     }
 
     return (
-        <div id="login-container" className='center'>
-            {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
-            <h2>Login</h2>
-            <form id="login-form" className="login-new-user-form">
-                <div>Email <input type="text" name="email" /></div>
-                <div>Password <input type="password" name="password" /></div>
-                <button className="btn submit-btn btn-border" onClick={loginHandler}>Submit</button>
-            </form>
-        </div>
+        <React.Fragment>
+            <ErrorMessage ref={errorMsgRef} />
+            <div id="login-container" className='center'>
+                <h2>Login</h2>
+                <form id="login-form" className="login-new-user-form">
+                    <div>Email <input type="text" name="email" /></div>
+                    <div>Password <input type="password" name="password" /></div>
+                    <button className="btn submit-btn btn-border" onClick={loginHandler}>Submit</button>
+                </form>
+            </div>
+        </React.Fragment>
     );
 }

@@ -1,5 +1,5 @@
 function NewUserForm(props) {
-    const [errorMessage, setErrorMessage] = React.useState(null);
+    const errorMsgRef = React.useRef();
 
     function registerUserHandler(evt) {
         evt.preventDefault();
@@ -19,23 +19,25 @@ function NewUserForm(props) {
                 props.loggedInSuccess();
             }
             else {
-                setErrorMessage(res.message);
+                errorMsgRef.current.showErrorMessage(res.message);
             }
         });
     }
 
     return (
-        <div id="new-user-container" className="center">
-            {errorMessage ? <ErrorMessage errorMessage={errorMessage} /> : null}
-            <h2>Create an Account</h2>
-            <form id="new-user-form" className="login-new-user-form">
-                <div>First Name <input type="text" name="fname" /></div>
-                <div>Last Name <input type="text" name="lname" /></div>
-                <div>Phone Number <input type="text" name="phone" /></div>
-                <div>Email <input type="text" name="email" /></div>
-                <div>Password <input type="password" name="password" /></div>
-                <button className="btn submit-btn btn-border" onClick={registerUserHandler}>Submit</button>
-            </form>
-        </div>
+        <React.Fragment>
+            <ErrorMessage ref={errorMsgRef} />
+            <div id="new-user-container" className="center">
+                <h2>Create an Account</h2>
+                <form id="new-user-form" className="login-new-user-form">
+                    <div>First Name <input type="text" name="fname" /></div>
+                    <div>Last Name <input type="text" name="lname" /></div>
+                    <div>Phone Number <input type="text" name="phone" /></div>
+                    <div>Email <input type="text" name="email" /></div>
+                    <div>Password <input type="password" name="password" /></div>
+                    <button className="btn submit-btn btn-border" onClick={registerUserHandler}>Submit</button>
+                </form>
+            </div>
+        </React.Fragment>
     );
 }

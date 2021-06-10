@@ -7,7 +7,7 @@
 function CriteriaFormContainer(props) {
     const [location, setLocation] = React.useState(false);
     const [isHost, setIsHost] = React.useState(false);
-    const [errorMessage, setErrorMessage] = React.useState(null);
+    const errorMsgRef = React.useRef();
 
     // const url = window.location.href;
 
@@ -33,19 +33,18 @@ function CriteriaFormContainer(props) {
         const sharedLink = document.querySelector("#shared-link");
         const sharedlinkText = sharedLink.textContent;
         navigator.clipboard.writeText(sharedlinkText);
-        setErrorMessage("Link has been copied")
+        errorMsgRef.current.showErrorMessage("Link has been copied");
     }
-    // TO-DO: Change this to react router
 
     return (
         <React.Fragment>
-            {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
+            <ErrorMessage ref={errorMsgRef} />
             <div id="criteria-form-container" className="center">
                 {isHost && <div id="invite-link"><div>Share this link with everyone participating:</div><div id="shared-link">{sharedLink}</div><button className='btn' onClick={copyLink}>Copy Link</button></div>}
                 <hr />
-                <CriteriaForm setErrorMessage={setErrorMessage} />
+                <CriteriaForm errorMsgRef={errorMsgRef} />
             </div>
-        </React.Fragment >
+        </React.Fragment>
     );
 }
 
@@ -53,7 +52,6 @@ function CriteriaForm(props) {
     const [savedBusinesses, setSavedBusinesses] = React.useState([]);
     const [showSavedBusinesses, setShowSavedBusinesses] = React.useState(false);
     const [arrowDirection, setArrowDirection] = React.useState('down');
-    const setErrorMessage = props.setErrorMessage;
 
     React.useEffect(() => {
         $.get('/get-saved-businesses.json', (res) => {
@@ -64,8 +62,6 @@ function CriteriaForm(props) {
     function submitCriteria(evt) {
         evt.preventDefault();
 
-        // const criteriaData = $('#criteria-form').serialize();
-
         if ($("#search-term-field").val() && $(".price:checked").val()) {
             const criteriaData = {
                 search_term: $("#search-term-field").val(),
@@ -75,13 +71,13 @@ function CriteriaForm(props) {
 
             $.post('/add-search-criteria.json', criteriaData, (res) => {
                 if (res.msg == "success") {
-                    props.setErrorMessage("Your preference has been added!");
+                    props.errorMsgRef.current.showErrorMessage("Your preference has been added!");
                 } else {
-                    props.setErrorMessage("Something went wrong. Try again.");
+                    props.errorMsgRef.current.showErrorMessage("Something went wrong. Try again.");
                 }
             });
         } else {
-            props.setErrorMessage("Please fill in type of food and price level!")
+            props.errorMsgRef.current.showErrorMessage("Please fill in type of food and price level!")
         }
 
 
@@ -114,7 +110,7 @@ function CriteriaForm(props) {
     for (const [index, business] of savedBusinesses.entries()) {
         businessesInfo.push(
             <div className="business-component" index={index} key={business.alias}>
-                <Business business={business} showSaveButton={false} showAddButton={true} setErrorMessage={setErrorMessage} />
+                <Business business={business} showSaveButton={false} showAddButton={true} errorMsgRef={props.errorMsgRef} />
                 <hr />
             </div>
         );
@@ -129,20 +125,12 @@ function CriteriaForm(props) {
                 <form id="criteria-form">
                     <div id="search-field-container"><span className="criteria-form-labels">Type of Food: </span><input type="text" name="search_term" id="search-term-field" /></div>
                     <div id="price-level-container">
-                        {/* Price Level:
-                        <select name="price">
-                            <option value="1">$</option>
-                            <option value="2">$$</option>
-                            <option value="3">$$$</option>
-                            <option value="4">$$$</option>
-                        </select> */}
                         <div id="price-level-label" className="criteria-form-labels">Price Level:</div>
                         <input type="radio" className="price" name="price" value="1" id="price-1" /><label className="price-label radio-label" htmlFor="price-1">$</label>
                         <input type="radio" className="price" name="price" value="2" id="price-2" /><label className="price-label radio-label" htmlFor="price-2">$$</label>
                         <input type="radio" className="price" name="price" value="3" id="price-3" /><label className="price-label radio-label" htmlFor="price-3">$$$</label>
                         <input type="radio" className="price" name="price" value="4" id="price-4" /><label className="price-label radio-label" htmlFor="price-4">$$$$</label>
                     </div>
-                    {/* <input type="submit" /> */}
                     <button className="btn submit-btn" id="submit-criteria-btn" onClick={submitCriteria}>Submit Criteria</button>
                 </form>
                 {/* <div>

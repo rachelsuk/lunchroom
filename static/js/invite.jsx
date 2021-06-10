@@ -6,7 +6,7 @@
 
 function Invite(props) {
     const [isHost, setIsHost] = React.useState(false);
-    const [errorMessage, setErrorMessage] = React.useState(null);
+    const errorMsgRef = React.useRef();
 
     const url = window.location.href;
 
@@ -29,7 +29,7 @@ function Invite(props) {
         const sharedLink = document.querySelector("#shared-link");
         const sharedlinkText = sharedLink.textContent;
         navigator.clipboard.writeText(sharedlinkText);
-        setErrorMessage("Link has been copied")
+        errorMsgRef.current.showErrorMessage("Link has been copied");
     }
 
     const loggedInSuccess = () => {
@@ -46,12 +46,12 @@ function Invite(props) {
 
     return (
         <React.Fragment>
-            {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
+            <ErrorMessage ref={errorMsgRef} />
             <Login noCloseBtn={true} loggedInSuccess={loggedInSuccess} />
             <div id="invite-component" className="center">
                 {isHost && <div id="invite-link"><div>Share this link with everyone participating:</div><div id="shared-link">{url}</div><button className='btn' onClick={copyLink}>Copy Link</button></div>}
                 <hr />
-                <UserLocationInput setErrorMessage={setErrorMessage} url={url} />
+                <UserLocationInput errorMsgRef={errorMsgRef} url={url} />
             </div>
         </React.Fragment >
     );
@@ -76,11 +76,11 @@ function UserLocationInput(props) {
                 },
                 function (error) {
                     console.error("Error Code = " + error.code + " - " + error.message);
-                    props.setErrorMessage('Could not get location. Please provide zipcode instead.')
+                    props.errorMsgRef.current.showErrorMessage('Could not get location. Please provide zipcode instead.');
                 }
             );
         } else {
-            props.setErrorMessage('Could not get location. Please provide zipcode instead.')
+            props.errorMsgRef.current.showErrorMessage('Could not get location. Please provide zipcode instead.')
         }
     }
 
@@ -102,7 +102,7 @@ function UserLocationInput(props) {
                 });
             })
         } else {
-            props.setErrorMessage('Not a valid zipcode - must be 5 integers long.')
+            props.errorMsgRef.current.showErrorMessage('Not a valid zipcode - must be 5 integers long.')
         }
 
     }
