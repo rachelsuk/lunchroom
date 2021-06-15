@@ -190,14 +190,15 @@ def start_quiz():
 
 @app.route('/retrieve-users-locations.json')
 def retrieve_users_locations():
+    user_id = session['user_id']
     yelphelper_session_id = session['yelphelper_session_id']
-    users_locations = crud.get_users_locations(yelphelper_session_id)
+    users_locations = crud.get_users_locations(yelphelper_session_id, user_id)
 
     return {"users_locations": users_locations}
 
 
-@app.route('/check-duration.json')
-def check_duration():
+@app.route('/initial-check-duration.json')
+def initial_check_duration():
     yelphelper_session_id = session['yelphelper_session_id']
     yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
     max_duration = float(request.args.get('max-duration'))
@@ -205,12 +206,29 @@ def check_duration():
     users_locations = crud.get_users_locations(yelphelper_session_id)
     response = distance_matrix_api.check_duration(
         users_locations, max_duration)
-    if response["msg"] == "success":
+    yelphelper_session.min_max_duration = response.get("min_max_duration")
+    db.session.add(yelphelper_session)
+    db.session.commit()
+
+    return response
+
+
+@app.route('/check-duration.json')
+def check_duration():
+    yelphelper_session_id = session['yelphelper_session_id']
+    yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
+    min_max_duration = yelphelper_session.min_max_duration
+    max_duration = float(request.args.get('max-duration'))
+    if max_duration >= min_max_duration:
         yelphelper_session.max_duration = max_duration
         db.session.add(yelphelper_session)
         db.session.commit()
+        msg="success"
+    else:
+        msg="fail"
 
-    return response
+
+    return {'msg':msg}
 
 
 @app.route('/retrieve-businesses.json', methods=['POST'])
@@ -260,6 +278,7 @@ def retrieve_businesses():
     while businesses_left > 0:
         for index, business in enumerate(businesses_batch):
             alias = business.get("alias")
+            # fetch all of this at once - database query are expensive. reduce amount of time query database.
             business_already_added = db.session.query(Business).filter_by(
                 yelphelper_session=yelphelper_session, alias=alias).first()
             if not business_already_added:
