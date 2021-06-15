@@ -3,16 +3,47 @@
 
 // TODO: show all restaurants (disable info for other restaurants and show restaurant as different color during quiz) to prevent re-rendering
 // on hover: don't open up info window, but show data to the right of the map.
-function QuizGoogleMap(props) {
-    const business = props.business;
-    const businessIndex = props.businessIndex
+const QuizGoogleMap = React.forwardRef((props, ref) => {
+    const businesses = props.businesses;
     const usersLocations = props.usersLocations;
     const [businessMarker, setBusinessMarker] = React.useState(null);
     const [userMarker, setUserMarker] = React.useState(null);
     const [duration, setDuration] = React.useState(null);
     const [distance, setDistance] = React.useState(null);
     const [distanceResponse, setDistanceResponse] = React.useState(null);
+    const [businessMarkers, setBusinessMarkers] = React.useState(null);
+    const [userMarkers, setUserMarkers] = React.useState(null);
+
     const savedCallback = React.useRef();
+
+    let prevUserMarker = false;
+
+    React.useImperativeHandle(ref, () => ({
+        highlightMarker: (index) => {
+            if (businessMarkers) {
+                if (prevBusinessMarker) {
+                    prevBusinessMarker.setIcon({
+                        url: '/static/img/business-marker.png',
+                        scaledSize: {
+                            width: 40,
+                            height: 40
+                        }
+                    });
+                }
+                prevBusinessMarker = marker;
+                businessMarkers[index].setIcon({
+                    url: '/static/img/business-marker-outline.png',
+                    scaledSize: {
+                        width: 40,
+                        height: 40
+                    }
+                });
+                // setBusinessMarker({ index: businessMarkers[index].index, name: businessMarker[index].title });
+            }
+
+
+        }
+    }));
 
     function markerCallback(marker, isUser) {
         if (isUser) {
@@ -47,22 +78,27 @@ function QuizGoogleMap(props) {
         const bounds = new google.maps.LatLngBounds();
 
         // create marker for each business
-        const businessMarker = new google.maps.Marker({
-            index: businessIndex,
-            position: { lat: business.lat, lng: business.lng },
-            title: business.name,
-            map: googleMap,
-            image_url: business.image_url,
-            url: business.url,
-        });
-
-        bounds.extend(businessMarker.position);
-
-        businessMarker.addListener('click', () => {
-            savedCallback.current(businessMarker, false);
-        });
-
-        setBusinessMarker({ index: businessMarker.index, name: businessMarker.title });
+        const businessMarkers = [];
+        for (const [index, business] of businesses.entries()) {
+            businessMarkers.push(new google.maps.Marker({
+                index: index,
+                position: { lat: business.lat, lng: business.lng },
+                title: business.name,
+                map: googleMap,
+                image_url: business.image_url,
+                url: business.url,
+                totalScore: business.total_score,
+                icon: {
+                    url: '/static/img/business-marker.png',
+                    scaledSize: {
+                        width: 40,
+                        height: 40
+                    }
+                }
+            }));
+            bounds.extend({ lat: business.lat, lng: business.lng });
+        }
+        setBusinessMarkers(businessMarkers);
 
         // create markers for each user
         const userMarkers = [];
@@ -74,23 +110,26 @@ function QuizGoogleMap(props) {
                     title: user.fname,
                     map: googleMap,
                     icon: {  // custom icon
-                        url: '/static/img/person-marker.png',
+                        url: '/static/img/user-marker.png',
                         scaledSize: {
-                            width: 30,
-                            height: 30
+                            width: 40,
+                            height: 40
                         }
-                    }
+                    },
+                    me: user.me
                 }));
             }
         }
 
-        let prevInfoWindow = false;
+        setUserMarkers(userMarkers);
+
+        let prevUserMarker = false;
         // create infoWindow for each user with info about the user
         for (const marker of userMarkers) {
             bounds.extend(marker.position);
 
             const markerInfo = (`
-                <h1 className='user-name'>${marker.title}</h1>
+                <h6 className='user-name'>${marker.title}</h6>
             `);
 
             const infoWindow = new google.maps.InfoWindow({
@@ -99,28 +138,48 @@ function QuizGoogleMap(props) {
             });
 
             marker.addListener('mouseover', () => {
-                if (prevInfoWindow) {
-                    prevInfoWindow.close();
-                }
-                prevInfoWindow = infoWindow;
                 infoWindow.open(googleMap, marker);
+            });
+
+            marker.addListener('mouseout', () => {
+                infoWindow.close(googleMap, marker);
             });
 
             marker.addListener('click', () => {
                 savedCallback.current(marker, true);
+                if (prevUserMarker) {
+                    prevUserMarker.setIcon({
+                        url: '/static/img/user-marker.png',
+                        scaledSize: {
+                            width: 40,
+                            height: 40
+                        }
+                    });
+                }
+                prevUserMarker = marker;
+                marker.setIcon({
+                    url: '/static/img/user-marker-mansae.png',
+                    scaledSize: {
+                        width: 40,
+                        height: 40
+                    }
+                });
             });
+            if (marker.me) {
+                google.maps.event.trigger(marker, 'click');
+            }
         }
-
         // auto center map to fit all business and user markers
         googleMap.fitBounds(bounds);
         googleMap.panToBounds(bounds);
 
         return function cleanup() {
             setDuration(null);
+            setDistance(null);
             setBusinessMarker(null);
             setUserMarker(null);
         };
-    }, [business, usersLocations]);
+    }, [businesses, usersLocations]);
 
 
 
@@ -134,9 +193,9 @@ function QuizGoogleMap(props) {
 
     return (
         <React.Fragment>
-            {duration && <div id="distance">Driving duration from {userMarker.name} to {businessMarker.name}: {Number((duration).toFixed(0))} minutes ({Number((distance).toFixed(1))} miles).</div>}
+            {duration && <div id="distance">It will take {userMarker.name} {Number((duration).toFixed(0))} minutes ({Number((distance).toFixed(1))} miles) to drive to {businessMarker.name}.</div>}
             <div id="google-map-quiz" className="google-map" />
         </React.Fragment>
     )
-}
+});
 

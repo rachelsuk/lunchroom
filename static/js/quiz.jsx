@@ -7,6 +7,8 @@ function QuizContainer(props) {
     const [businessIndex, setBusinessIndex] = React.useState(0);
     const [usersLocations, setUsersLocations] = React.useState([]);
 
+
+
     React.useEffect(() => {
         const getBusinesses = async () => {
             const businessesFromServer = await fetchBusinesses();
@@ -21,6 +23,8 @@ function QuizContainer(props) {
 
     }, [])
 
+
+
     // Fetch Businesses
     const fetchBusinesses = async () => {
         const res = await fetch('/businesses.json');
@@ -33,12 +37,9 @@ function QuizContainer(props) {
     function submitHandler(evt) {
         evt.preventDefault();
 
-
-
         const businessScoreInput = {
             'business-index': businessIndex,
             'score': $(".business-score:checked").val()
-            // 'score': document.querySelector('#business-score').elements.business_score.value
         };
         $.post('/save-score', businessScoreInput, (res) => {
             if (businessIndex < businesses.length - 1) {
@@ -51,6 +52,8 @@ function QuizContainer(props) {
         });
 
     }
+
+
 
     return (
         <React.Fragment>
@@ -66,13 +69,19 @@ function Quiz(props) {
     const business = businesses[businessIndex];
     const usersLocations = props.usersLocations;
     const errorMsgRef = React.useRef();
+    const mapRef = React.useRef();
+
+    React.useEffect(() => {
+        mapRef.current.highlightMarker(businessIndex);
+    }, [businessIndex])
+
 
     return (
         <React.Fragment>
             <ErrorMessage ref={errorMsgRef} />
             <div id='business-quiz-container' className="center">
                 <div className='google-map-container'>
-                    <QuizGoogleMap business={business} businessIndex={businessIndex} usersLocations={usersLocations} />
+                    <QuizGoogleMap businesses={businesses} usersLocations={usersLocations} ref={mapRef} />
                 </div>
                 <div id='business-quiz'>
                     <Business business={business} showSaveButton={true} errorMsgRef={errorMsgRef} />
@@ -109,7 +118,7 @@ function Quiz(props) {
                                 <span className="tooltiptext">This is the place for sure!</span>
                             </div>
                         </div>
-                        <button className="btn submit-btn" id="submit-business-score-btn" onClick={props.submitHandler}>Go to Next Restaurant</button>
+                        <button className="btn submit-btn" id="submit-business-score-btn" onClick={props.submitHandler}>Done! Go to Next Restaurant</button>
                     </form>
                 </div>
             </div>
