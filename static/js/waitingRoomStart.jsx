@@ -43,12 +43,12 @@ function WaitingRoomStart(props) {
 
                 savedCallback.current(result.users_locations);
             });
-        }, 10000);
+        }, 300);
         return () => clearInterval(interval);
     }, []);
 
     function startQuiz() {
-        $.get('/check-duration.json', { "max-duration": 0 }, (res) => {
+        $.get('/initial-check-duration.json', { "max-duration": 0 }, (res) => {
             $('#minimum-duration').html(`Maximum duration must at least ${res.min_max_duration} minutes.`)
         });
 
@@ -57,14 +57,17 @@ function WaitingRoomStart(props) {
 
     function checkDuration(evt) {
         evt.preventDefault();
+        const submitBtn = document.querySelector(".submit-btn");
+        submitBtn.innerHTML = 'loading..';
 
         const durationData = $('#max-duration-form').serialize();
 
         $.get('/check-duration.json', durationData, (res) => {
+
             if (res.msg == "success") {
-                errorMsgRef.current.showErrorMessage("Maximum duration has been accepted!");
                 $.post('/retrieve-businesses.json', (res) => {
                     if (res.msg == 'success') {
+                        errorMsgRef.current.showErrorMessage("Maximum duration has been accepted!");
                         $.post('/save-distances.json', (res) => {
                             if (res.msg == 'success') {
                                 $.post('/start-quiz.json', (res) => {
@@ -77,12 +80,14 @@ function WaitingRoomStart(props) {
 
                     } else if (res.msg == "fail") {
                         errorMsgRef.current.showErrorMessage('Not enough restaurants within the driving duration range. Try a larger maximum driving duration.')
+                        submitBtn.innerHTML = 'Submit';
                     }
 
                 })
 
             } else if (res.msg == "fail") {
                 errorMsgRef.current.showErrorMessage(`Invalid maximum duration. Maximum duration must at least ${res.min_max_duration} miles.`)
+                submitBtn.innerHTML = 'Submit';
             }
         });
 
@@ -96,14 +101,14 @@ function WaitingRoomStart(props) {
                 {started && (<React.Fragment>
                     <div id="minimum-duration"></div>
                     <form id="max-duration-form">
-                        <label>Maximum driving duration: </label>
-                        <input type="text" name="max-duration" id="max-duration-field" />
+                        <label>How far is everyone willing to drive? </label>
+                        <input type="text" name="max-duration" id="max-duration-field" /> minutes
                         <button className="btn submit-btn" onClick={checkDuration}>Submit</button>
                     </form></React.Fragment>)}
                 <hr />
                 {(isHost && !started) && <div id='start-quiz-btn-container'><button className="btn" id="start-quiz-btn" onClick={startQuiz}>Everyone In? Let's Start!</button><span className="triangle-right" id="triangle-right-start-quiz"></span></div>}
-                {/* 
-                <GoogleMap usersLocations={usersLocations} businesses={[]} /> */}
+
+                <GoogleMap usersLocations={usersLocations} businesses={[]} />
             </div>
         </React.Fragment>
     );
