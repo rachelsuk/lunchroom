@@ -109,11 +109,23 @@ function CriteriaForm(props) {
     const businessesInfo = [];
     for (const [index, business] of savedBusinesses.entries()) {
         businessesInfo.push(
-            <div className="business-component" index={index} key={business.alias}>
+            <div className="business-component" index={index} key={business.alias} name={business.name}>
                 <Business business={business} showSaveButton={false} showAddButton={true} errorMsgRef={props.errorMsgRef} />
                 <hr />
             </div>
         );
+    }
+
+    function filterSavedBusinesses() {
+        const savedBusinessSearch = $("#saved-businesses-search").val().toLowerCase();
+        $('#choose-saved-businesses > .business-component').each(function () {
+            if (this.getAttribute('name').toLowerCase().search(savedBusinessSearch) > -1) {
+                $(this).show();
+            }
+            else {
+                $(this).hide();
+            }
+        })
     }
 
     const show = (showSavedBusinesses) ? "show" : "";
@@ -137,10 +149,11 @@ function CriteriaForm(props) {
                     Find Specific Restaurant: <input type="text" id="specific-business-input"></input>
                     <button onClick={findBusiness}>Find Restaurant.</button>
                 </div> */}
-                <button className="btn" type="button" onClick={toggleSavedBusinesses}>
+                {savedBusinesses.length > 0 && <button className="btn" type="button" onClick={toggleSavedBusinesses}>
                     Add a saved restaurant <i className={"arrow " + arrowDirection} />
-                </button>
+                </button>}
                 <div className={"collapse " + show}>
+                    <div id="saved-businesses-search-form">Search: <input id="saved-businesses-search" type="text" onKeyUp={filterSavedBusinesses}></input></div>
                     <div id="choose-saved-businesses" className="overflow-auto">{businessesInfo}</div>
                 </div>
             </div>
