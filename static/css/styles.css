@@ -218,6 +218,7 @@ input[type="password"] {
   height: 30vw;
   margin: auto;
   width: 60%;
+  padding-top: 10px;
 }
 
 #go-to-waiting-room-btn {
@@ -287,6 +288,8 @@ input[type="radio"].price:hover + label {
   margin: 1em;
   vertical-align: middle;
   line-height: normal;
+  width: calc(50% - 2em);
+  box-sizing: border-box;
 }
 
 .business-btns {
@@ -294,6 +297,8 @@ input[type="radio"].price:hover + label {
   margin: 1em;
   vertical-align: middle;
   line-height: normal;
+  width: calc(50% - 2em);
+  box-sizing: border-box;
 }
 
 .business-name {
@@ -347,9 +352,10 @@ input[type="radio"].price:hover + label {
 }
 
 .google-map {
-  margin: auto;
   width: 50vw;
   height: 40vw;
+  margin: auto;
+  width: 100%;
 }
 
 #start-quiz-btn {
@@ -395,6 +401,7 @@ input[type="radio"].price:hover + label {
   display: inline-block;
   vertical-align: middle;
   line-height: normal;
+  width: 50%;
 }
 
 #google-map-quiz {
@@ -478,7 +485,9 @@ input[type="radio"].business-score:hover + label + span {
   display: inline-block;
   vertical-align: middle;
   line-height: normal;
-  margin: 1em;
+  /* margin: 1em; */
+  width: 50%;
+  margin: auto;
 }
 
 #result-container {
@@ -488,7 +497,8 @@ input[type="radio"].business-score:hover + label + span {
 #google-map-result .google-map {
   width: 40vw;
   height: 30vw;
-  margin: 0;
+  margin: auto;
+  width: 100%;
 }
 
 .prev-next-btns {
@@ -655,4 +665,43 @@ input[type="radio"].business-score:hover + label + span {
     top: 0;
     opacity: 0;
   }
+}
+
+h6 {
+  color: black;
+  text-align: center;
+  margin: 5px;
+}
+
+@media only screen and (max-width: 1026px) {
+  .google-map-container {
+    display: none;
+  }
+  .business-result-container {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 1450px) {
+  .business-info {
+    width: 100%;
+    margin: auto;
+    margin-bottom: 15px;
+  }
+
+  .business-btns {
+    width: 100%;
+    margin: auto;
+  }
+}
+
+#distance {
+  word-wrap: normal;
+  max-width: 100%;
+  text-align: center;
+}
+
+#saved-businesses-search-form {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
