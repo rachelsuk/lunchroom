@@ -59,6 +59,8 @@ function Invite(props) {
 
 function UserLocationInput(props) {
     function getExactCoords() {
+        const exactLocationBtn = document.querySelector("#exact-location-btn");
+        exactLocationBtn.innerHTML = 'Getting your location...';
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 function (position) {
@@ -77,10 +79,12 @@ function UserLocationInput(props) {
                 function (error) {
                     console.error("Error Code = " + error.code + " - " + error.message);
                     props.errorMsgRef.current.showErrorMessage('Could not get location. Please provide zipcode instead.');
+                    exactLocationBtn.innerHTML = 'Share My Location';
                 }
             );
         } else {
             props.errorMsgRef.current.showErrorMessage('Could not get location. Please provide zipcode instead.')
+            exactLocationBtn.innerHTML = 'Share My Location';
         }
     }
 
@@ -110,9 +114,8 @@ function UserLocationInput(props) {
     return (
         <div id="user-location-form">
             <div id='provide-your-location'>Provide Your Location:</div>
-            <button className="btn" id="exact-location-btn" onClick={getExactCoords}>Share My Location</button>
-        OR
-            <form id="zipcode-form">
+            <button className="btn" id="exact-location-btn" onClick={getExactCoords}>Share My Location
+            </button>OR<form id="zipcode-form">
                 <label>Zipcode:</label>
                 <input type="text" name="zipcode" id="zipcode-field" />
                 <button className="btn submit-btn" onClick={getZipCodeCoords}>Submit</button>
