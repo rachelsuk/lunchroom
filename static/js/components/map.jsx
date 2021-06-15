@@ -3,15 +3,28 @@
 
 // TODO: show all restaurants (disable info for other restaurants and show restaurant as different color during quiz) to prevent re-rendering
 // on hover: don't open up info window, but show data to the right of the map.
-function GoogleMap(props) {
+const GoogleMap = React.forwardRef((props, ref) => {
     const businesses = props.businesses;
     const usersLocations = props.usersLocations;
+    const setBusinessIndex = props.setBusinessIndex;
     const [businessMarker, setBusinessMarker] = React.useState(null);
     const [userMarker, setUserMarker] = React.useState(null);
     const [duration, setDuration] = React.useState(null);
     const [distance, setDistance] = React.useState(null);
     const [distanceResponse, setDistanceResponse] = React.useState(null);
+    const [businessMarkers, setBusinessMarkers] = React.useState(null);
+    const [userMarkers, setUserMarkers] = React.useState(null);
+
     const savedCallback = React.useRef();
+
+    React.useImperativeHandle(ref, () => ({
+        highlightMarker: (index) => {
+            if (businessMarkers) {
+                google.maps.event.trigger(businessMarkers[index], 'click');
+            }
+        }
+
+    }));
 
     function markerCallback(marker, isUser) {
         if (isUser) {
@@ -46,7 +59,6 @@ function GoogleMap(props) {
         // create marker for each business
         const businessMarkers = [];
         for (const [index, business] of businesses.entries()) {
-            let number = index + 1
             businessMarkers.push(new google.maps.Marker({
                 index: index,
                 position: { lat: business.lat, lng: business.lng },
@@ -55,50 +67,44 @@ function GoogleMap(props) {
                 image_url: business.image_url,
                 url: business.url,
                 totalScore: business.total_score,
-                label: number.toString(),
-                // icon: {  // custom icon
-                //     url: '/static/img/hamburger.png',
-                //     scaledSize: {
-                //         width: 30,
-                //         height: 30
-                //     }
-                // }
+                icon: {
+                    url: '/static/img/business-marker.png',
+                    scaledSize: {
+                        width: 40,
+                        height: 40
+                    }
+                }
             }));
         }
+        setBusinessMarkers(businessMarkers);
 
-        let prevInfoWindow = false;
+        let prevBusinessMarker = false;
 
         // create infoWindow for each business with info about business
         for (const marker of businessMarkers) {
             bounds.extend(marker.position);
 
-            const markerInfo = (`
-                <h1><a className='business-name' href=${marker.url} target="_blank">#${marker.label}. ${marker.title}</a></h1>
-                <img src=${marker.image_url} width="150" height="150" />
-                <p>
-                <div>Total Score of <b>${marker.totalScore}</b></div>
-                Located at: <code>${marker.position.lat()}</code>,
-                <code>${marker.position.lng()}</code>
-                </p>
-            `);
-
-            const infoWindow = new google.maps.InfoWindow({
-                content: markerInfo,
-                maxWidth: 200
-            });
-
-            marker.addListener('mouseover', () => {
-                if (prevInfoWindow) {
-                    prevInfoWindow.close();
-                }
-                prevInfoWindow = infoWindow;
-                infoWindow.open(googleMap, marker);
-
-            });
             marker.addListener('click', () => {
                 savedCallback.current(marker, false);
+                if (prevBusinessMarker) {
+                    prevBusinessMarker.setIcon({
+                        url: '/static/img/business-marker.png',
+                        scaledSize: {
+                            width: 40,
+                            height: 40
+                        }
+                    });
+                }
+                prevBusinessMarker = marker;
+                marker.setIcon({
+                    url: '/static/img/business-marker-outline.png',
+                    scaledSize: {
+                        width: 40,
+                        height: 40
+                    }
+                });
+                setBusinessIndex(marker.index);
             });
-
         }
 
         // create markers for each user
@@ -111,26 +117,25 @@ function GoogleMap(props) {
                     title: user.fname,
                     map: googleMap,
                     icon: {  // custom icon
-                        url: '/static/img/person-marker.png',
+                        url: '/static/img/user-marker.png',
                         scaledSize: {
-                            width: 30,
-                            height: 30
+                            width: 40,
+                            height: 40
                         }
-                    }
+                    },
+                    me: user.me
                 }));
             }
         }
+        setUserMarkers(userMarkers);
 
-
+        let prevUserMarker = false;
         // create infoWindow for each user with info about the user
         for (const marker of userMarkers) {
             bounds.extend(marker.position);
 
             const markerInfo = (`
-                <h1 className='user-name'>${marker.title}</h1>
-                Located at: <code>${marker.position.lat()}</code>,
-                <code>${marker.position.lng()}</code>
-                </p>
+                <h6 className='user-name'>${marker.title}</h6>
             `);
 
             const infoWindow = new google.maps.InfoWindow({
@@ -139,16 +144,36 @@ function GoogleMap(props) {
             });
 
             marker.addListener('mouseover', () => {
-                if (prevInfoWindow) {
-                    prevInfoWindow.close();
-                }
-                prevInfoWindow = infoWindow;
                 infoWindow.open(googleMap, marker);
+            });
+
+            marker.addListener('mouseout', () => {
+                infoWindow.close(googleMap, marker);
             });
 
             marker.addListener('click', () => {
                 savedCallback.current(marker, true);
+                if (prevUserMarker) {
+                    prevUserMarker.setIcon({
+                        url: '/static/img/user-marker.png',
+                        scaledSize: {
+                            width: 40,
+                            height: 40
+                        }
+                    });
+                }
+                prevUserMarker = marker;
+                marker.setIcon({
+                    url: '/static/img/user-marker-mansae.png',
+                    scaledSize: {
+                        width: 40,
+                        height: 40
+                    }
+                });
             });
+            if (marker.me) {
+                google.maps.event.trigger(marker, 'click');
+            }
         }
 
         // auto center map to fit all business and user markers
@@ -175,9 +200,9 @@ function GoogleMap(props) {
 
     return (
         <React.Fragment>
-            {duration && <div id="distance">Driving duration from {userMarker.name} to {businessMarker.name}: {Number((duration).toFixed(0))} minutes ({Number((distance).toFixed(1))} miles).</div>}
+            {duration && <div id="distance">It will take {userMarker.name} {Number((duration).toFixed(0))} minutes ({Number((distance).toFixed(1))} miles) to drive to {businessMarker.name}.</div>}
             <div id="google-map" className="google-map" />
         </React.Fragment>
     )
-}
+});
 
