@@ -38,14 +38,18 @@ def get_user_yelphelper_sessions(yelphelper_session_id):
     return users_yelphelper_sessions
 
 
-def get_users_locations(yelphelper_session_id):
+def get_users_locations(yelphelper_session_id, user_id=None):
     users = get_user_yelphelper_sessions(yelphelper_session_id)
     users_locations = []
     for user in users:
         u = User.query.get(user.user_id)
         if (user.lat and user.lng):
-            users_locations.append(
-                {"fname": u.fname, "lat": user.lat, "lng": user.lng})
+            if user_id == u.user_id:
+                users_locations.append(
+                    {"fname": u.fname, "lat": user.lat, "lng": user.lng, "me": True})
+            else:
+                users_locations.append(
+                    {"fname": u.fname, "lat": user.lat, "lng": user.lng, "me": False})
     return users_locations
 
 
