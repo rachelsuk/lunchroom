@@ -13,7 +13,6 @@ def business_search(lat, lng, search_term=None, price=None, min_rating=None):
     # Make a request to the Business Search endpoint to search for businesses
     res = requests.get(url, params=payload, headers=headers)
     search_results = res.json()
-    print(search_results)
     return search_results['businesses']
 
 
