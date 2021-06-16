@@ -611,6 +611,19 @@ def add_saved_business_to_yp_session():
     return {"msg": msg}
 
 
+@app.route('/get-user-data.json')
+def get_user_data():
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+    fname = user.fname
+    lname = user.lname
+    phone = user.phone
+    email = user.email
+    password = user.password
+
+
+    return {"fname": fname, "lname": lname, "phone": phone, "email": email, "password": password}
+
 if __name__ == '__main__':
     model.connect_to_db(app)
     app.run(debug=True, host='0.0.0.0')
