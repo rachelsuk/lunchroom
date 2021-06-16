@@ -13,14 +13,15 @@ const QuizGoogleMap = React.forwardRef((props, ref) => {
     const [distanceResponse, setDistanceResponse] = React.useState(null);
     const [businessMarkers, setBusinessMarkers] = React.useState(null);
     const [userMarkers, setUserMarkers] = React.useState(null);
+    const [prevBusinessMarker, setPrevBusinessMarker] = React.useState(null);
 
     const savedCallback = React.useRef();
 
-    let prevUserMarker = false;
-
     React.useImperativeHandle(ref, () => ({
         highlightMarker: (index) => {
+            console.log('highlight')
             if (businessMarkers) {
+                console.log('bsuinessMarkers is true')
                 if (prevBusinessMarker) {
                     prevBusinessMarker.setIcon({
                         url: '/static/img/business-marker.png',
@@ -30,7 +31,7 @@ const QuizGoogleMap = React.forwardRef((props, ref) => {
                         }
                     });
                 }
-                prevBusinessMarker = marker;
+                setPrevBusinessMarker(businessMarkers[index]);
                 businessMarkers[index].setIcon({
                     url: '/static/img/business-marker-outline.png',
                     scaledSize: {
@@ -38,34 +39,39 @@ const QuizGoogleMap = React.forwardRef((props, ref) => {
                         height: 40
                     }
                 });
-                // setBusinessMarker({ index: businessMarkers[index].index, name: businessMarker[index].title });
+                savedCallback.current(businessMarkers[index], false);
             }
-
-
         }
     }));
 
-    function markerCallback(marker, isUser) {
+    function markerCallback(marker, isUser = false) {
         if (isUser) {
+            console.log(marker.title)
             setUserMarker({ index: marker.index, name: marker.title });
 
         } else {
             setBusinessMarker({ index: marker.index, name: marker.title });
         }
     }
-
     React.useEffect(() => {
-        if (userMarker && businessMarker) {
+        console.log('here')
+        if (userMarker && businessMarker && distanceResponse) {
+            console.log('true1')
             setDuration(findDistance(userMarker.index, businessMarker.index).durationMinutes);
             setDistance(findDistance(userMarker.index, businessMarker.index).distanceMiles);
         }
         savedCallback.current = markerCallback;
-    }, [userMarker, businessMarker])
+    }, [userMarker, businessMarker, distanceResponse])
+
 
     React.useEffect(() => {
         $.get('/get-distances.json', (res) => {
+            console.log('get distances')
             if (res.msg == 'success') {
                 setDistanceResponse(res.distance_matrix);
+                console.log('success')
+            } else {
+                console.log('fail')
             }
         })
 
@@ -98,7 +104,19 @@ const QuizGoogleMap = React.forwardRef((props, ref) => {
             }));
             bounds.extend({ lat: business.lat, lng: business.lng });
         }
+
         setBusinessMarkers(businessMarkers);
+
+        const firstBusiness = businessMarkers[0];
+        savedCallback.current(firstBusiness, false);
+        setPrevBusinessMarker(firstBusiness);
+        firstBusiness.setIcon({
+            url: '/static/img/business-marker-outline.png',
+            scaledSize: {
+                width: 40,
+                height: 40
+            }
+        });
 
         // create markers for each user
         const userMarkers = [];
@@ -180,6 +198,8 @@ const QuizGoogleMap = React.forwardRef((props, ref) => {
             setUserMarker(null);
         };
     }, [businesses, usersLocations]);
+
+
 
 
 

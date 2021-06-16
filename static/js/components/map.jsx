@@ -200,7 +200,7 @@ const GoogleMap = React.forwardRef((props, ref) => {
 
     return (
         <React.Fragment>
-            {duration && <div id="distance">It will take {userMarker.name} {Number((duration).toFixed(0))} minutes ({Number((distance).toFixed(1))} miles) to drive to {businessMarker.name}.</div>}
+            {(duration && distance) && <div id="distance">It will take {userMarker.name} {Number((duration).toFixed(0))} minutes ({Number((distance).toFixed(1))} miles) to drive to {businessMarker.name}.</div>}
             <div id="google-map" className="google-map" />
         </React.Fragment>
     )
