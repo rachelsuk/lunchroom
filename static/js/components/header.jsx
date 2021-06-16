@@ -24,6 +24,14 @@ function Header(props) {
         window.location.assign(`/profile`)
     }
 
+    function redirectAboutApp() {
+        window.location.assign(`/about-app`)
+    }
+
+    function redirectCredits() {
+        window.location.assign(`/credits`)
+    }
+
     const loggedInSuccess = () => {
         $.get('/check-login.json', (res) => {
             setLoggedIn(res.logged_in);
@@ -34,7 +42,7 @@ function Header(props) {
             <Login loggedInSuccess={loggedInSuccess} />
             <nav className="navbar navbar-expand-lg navbar-dark">
                 <div className="container-fluid">
-                    {!isHomepage ? <a className="navbar-brand" id="navbar-brand" href="/">YelpHelper</a> : null}
+                    {!isHomepage && <a className="navbar-brand" id="navbar-brand" href="/">LunchRoom</a>}
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
@@ -53,6 +61,14 @@ function Header(props) {
                                     <button className="btn" onClick={openModal}>Login</button>
                                 </li>
                             </ul>}
+                        <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+                            <li className="nav-item">
+                                <button className="btn nav-right" onClick={redirectAboutApp}>About this App</button>
+                            </li>
+                            <li className="nav-item">
+                                <button className="btn nav-right" onClick={redirectCredits}>Credits</button>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </nav>
