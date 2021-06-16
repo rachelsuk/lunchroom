@@ -2,6 +2,7 @@ function Business(props) {
     const business = props.business;
     const showSaveButton = props.showSaveButton;
     const showAddButton = props.showAddButton;
+    const showRemoveButton = props.showRemoveButton;
     const showBusinessRanking = props.showBusinessRanking;
     const businessIndex = props.businessIndex;
 
@@ -26,6 +27,17 @@ function Business(props) {
         });
     }
 
+    function removeBusiness(evt) {
+        $.post('/remove-saved-business.json', { 'saved-business-id': business.saved_business_id }, (res) => {
+            if (res.msg == "success") {
+                props.errorMsgRef.current.showErrorMessage("Business has been removed from saved businesses.")
+                $.get('/get-saved-businesses.json', (res) => {
+                    props.setSavedBusinesses(res.saved_businesses);
+                })
+            }
+        });
+    }
+
     return (
         <React.Fragment>
             <div className="business-container" id={'business-id-' + business.saved_business_id}>
@@ -40,10 +52,10 @@ function Business(props) {
                         <li>Number of Yelp Reviews: {business.review_count}</li>
                         <li>Number of Yelp Stars: {business.yelp_rating}</li>
                     </ul>}
-                </div>
-                <div className="business-btns">
-                    {showSaveButton && <button className="btn save-restaurant-btn" onClick={addToSavedBusinesses}>Add to my saved restaurants</button>}
-                    {showAddButton && <button className="btn add-restaurant-to-session-btn" onClick={addBusiness}>Add Restaurant</button>}
+                </div><div className="business-btns">
+                    {showSaveButton && <button className="btn business-btn" onClick={addToSavedBusinesses}>Add to my saved restaurants</button>}
+                    {showAddButton && <button className="btn business-btn" onClick={addBusiness}>Add Restaurant</button>}
+                    {showRemoveButton && <button className="btn business-btn" onClick={removeBusiness}>Unsave Restaurant</button>}
                 </div>
             </div>
         </React.Fragment >
