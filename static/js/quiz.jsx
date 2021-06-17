@@ -80,6 +80,10 @@ function Quiz(props) {
         <React.Fragment>
             <ErrorMessage ref={errorMsgRef} />
             <div id='business-quiz-container' className="center">
+                <div id="quiz-brand">LUNCH <span className="dot"></span> ROOM</div>
+                <div className="w3-light-grey w3-round-xlarge" style={{ width: "75%", margin: "auto", "margin-bottom": "2em" }}>
+                    <div className="w3-container w3-red w3-round-xlarge" style={{ height: "24px", width: `${businessIndex * 10}%` }}>{businessIndex * 10}%</div>
+                </div>
                 <div className='google-map-container'>
                     <QuizGoogleMap businesses={businesses} usersLocations={usersLocations} ref={mapRef} />
                 </div>
@@ -123,7 +127,7 @@ function Quiz(props) {
                 </div>
             </div>
 
-        </React.Fragment>
+        </React.Fragment >
     )
 }
 
