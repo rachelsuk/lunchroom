@@ -22,6 +22,10 @@
   font-family: spectral-extralight;
   src: url("/static/fonts/Spectral/Spectral-ExtraLight.ttf");
 }
+@font-face {
+  font-family: karla-light;
+  src: url("/static/fonts/Karla/Karla-Light.ttf");
+}
 
 body {
   font-family: karla-medium;
@@ -204,6 +208,7 @@ input[type="text"] {
   margin: 5px;
   width: 250px;
   text-align: center;
+  font-size: 80%;
 }
 
 input[type="password"] {
@@ -385,6 +390,7 @@ input[type="radio"].price:hover + label {
 
 #business-quiz-container {
   width: 90%;
+  margin-top: 3%;
 }
 
 .google-map-container {
@@ -482,6 +488,7 @@ input[type="radio"].business-score:hover + label + span {
 
 #result-container {
   width: 90%;
+  margin-top: 5%;
 }
 
 #google-map-result .google-map {
@@ -689,6 +696,9 @@ h6 {
   word-wrap: normal;
   max-width: 100%;
   text-align: center;
+  font-size: 1.5em;
+  margin-bottom: 0.5em;
+  font-family: karla-light;
 }
 
 #saved-businesses-search-form {
@@ -747,7 +757,11 @@ h6 {
   top: 125px;
   left: 10px;
   padding-right: 20px;
-  font-size: 1.5em;
+  font-size: 30px;
+}
+
+.profile-btns {
+  font-size: 20px;
 }
 
 #profile-saved-businesses {
@@ -758,8 +772,88 @@ h6 {
 
 #edit-profile {
   margin-top: 5%;
+  height: 40vw;
 }
 
-#profile-headers {
-  margin: 2em;
+.profile-headers {
+  margin: 1.5em;
+}
+
+#profile-info-container {
+  width: 80%;
+  background-color: white;
+  height: 400px;
+  margin: auto;
+  border-radius: 4px; /* Rounded borders */
+  position: relative;
+}
+
+#profile-infos {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: auto;
+  width: 100%;
+  color: #0f1a26;
+  font-size: max(2vw, 1.5em);
+}
+
+#profile-infos-edit {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: auto;
+  width: 100%;
+  color: #0f1a26;
+  font-size: max(2vw, 1.5em);
+}
+
+button:disabled,
+button[disabled] {
+  color: #bfced9;
+  /* background-color: #bfced9; */
+  /* border-radius: 15px;
+  margin: 0.5em;
+  padding: 5px 15px; */
+  font-size: 2em;
+  font-family: karla-regular;
+}
+
+.business-details {
+  margin-top: 1em;
+}
+
+#egg-img {
+  position: fixed;
+  left: -50px;
+  bottom: 100px;
+  z-index: -1;
+  transform: rotate(30deg);
+  min-width: 250px;
+  width: 30%;
+}
+
+#tempura-img {
+  position: fixed;
+  right: -50px;
+  top: 70px;
+  z-index: -1;
+  transform: rotate(30deg);
+  min-width: 250px;
+  width: 30%;
+}
+
+#quiz-brand {
+  font-family: spectral-regular;
+  font-size: 4em;
+  margin: 0.5em;
+}
+
+.dot {
+  height: 15px;
+  width: 15px;
+  background-color: white;
+  border-radius: 50%;
+  display: inline-block;
+  margin-bottom: 15px;
 }
