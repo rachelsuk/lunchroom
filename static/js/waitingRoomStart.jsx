@@ -6,18 +6,31 @@ function WaitingRoomStart(props) {
     const [isHost, setIsHost] = React.useState(false);
     const [usersLocations, setUsersLocations] = React.useState([]);
     const [started, setStarted] = React.useState(false);
+    const [waitingRoomCount, setWaitingRoomCount] = React.useState(0);
+    const [allUsersCount, setAllUsersCount] = React.useState(0);
+    const [percent, setPercent] = React.useState(0)
     const savedCallback = React.useRef();
     const errorMsgRef = React.useRef();
 
     function callback(users_locations) {
         // why users_locations != usersLocations doesn't work?
         if (users_locations.length != usersLocations.length) {
-            console.log(users_locations)
-            console.log(usersLocations)
-            // console.log(users_locations.length === usersLocations.length)
-            console.log(typeof (users_locations[0]) === typeof (usersLocations[0]))
             setUsersLocations(users_locations);
-            console.log(usersLocations)
+        }
+        setAllUsersCount(users_locations.length)
+        let count = 0;
+        for (const user of users_locations) {
+            if (user.in_waiting_room) {
+                count += 1;
+            }
+        }
+        setWaitingRoomCount(count);
+        setPercent((waitingRoomCount / allUsersCount) * 100)
+        const startQuizBtn = document.getElementById("start-quiz-btn");
+        if (percent == 100) {
+            startQuizBtn.disabled = false;
+        } else {
+            startQuizBtn.disabled = true;
         }
     }
 
@@ -38,9 +51,6 @@ function WaitingRoomStart(props) {
                 }
             });
             $.get('/retrieve-users-locations.json', (result) => {
-                console.log(result.users_locations)
-                console.log(usersLocations)
-
                 savedCallback.current(result.users_locations);
             });
         }, 300);
@@ -49,7 +59,7 @@ function WaitingRoomStart(props) {
 
     function startQuiz() {
         $.get('/initial-check-duration.json', { "max-duration": 0 }, (res) => {
-            $('#minimum-duration').html(`Maximum duration must at least ${res.min_max_duration} minutes.`)
+            $('#minimum-duration').html(`Maximum duration must at least ${Number((res.min_max_duration).toFixed(0))} minutes.`)
         });
 
         setStarted(true);
@@ -96,8 +106,12 @@ function WaitingRoomStart(props) {
     return (
         <React.Fragment>
             <ErrorMessage ref={errorMsgRef} />
+            <img id="tempura-img" src='/static/img/tempura.svg'></img>
             <div className='center'>
                 {!started && <div id="waiting-room-start-heading">Waiting for all participants to join..</div>}
+                {!started && <div><div className="w3-light-grey w3-round-xlarge" style={{ width: "50%", margin: "auto" }}>
+                    <div className="w3-container w3-red w3-round-xlarge" style={{ height: "24px", width: `${percent}%` }}>{waitingRoomCount}/{allUsersCount}</div>
+                </div><div style={{ margin: "1em" }}>participants are in the waiting room</div></div>}
                 {started && (<React.Fragment>
                     <div id="minimum-duration"></div>
                     <form id="max-duration-form">
@@ -110,7 +124,8 @@ function WaitingRoomStart(props) {
 
                 <GoogleMap usersLocations={usersLocations} businesses={[]} />
             </div>
-        </React.Fragment>
+            <img id="egg-img" src='/static/img/egg.svg'></img>
+        </React.Fragment >
     );
 }
 
