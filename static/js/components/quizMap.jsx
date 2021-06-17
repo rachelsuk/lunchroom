@@ -19,9 +19,7 @@ const QuizGoogleMap = React.forwardRef((props, ref) => {
 
     React.useImperativeHandle(ref, () => ({
         highlightMarker: (index) => {
-            console.log('highlight')
             if (businessMarkers) {
-                console.log('bsuinessMarkers is true')
                 if (prevBusinessMarker) {
                     prevBusinessMarker.setIcon({
                         url: '/static/img/business-marker.png',
@@ -46,7 +44,6 @@ const QuizGoogleMap = React.forwardRef((props, ref) => {
 
     function markerCallback(marker, isUser = false) {
         if (isUser) {
-            console.log(marker.title)
             setUserMarker({ index: marker.index, name: marker.title });
 
         } else {
@@ -54,9 +51,7 @@ const QuizGoogleMap = React.forwardRef((props, ref) => {
         }
     }
     React.useEffect(() => {
-        console.log('here')
         if (userMarker && businessMarker && distanceResponse) {
-            console.log('true1')
             setDuration(findDistance(userMarker.index, businessMarker.index).durationMinutes);
             setDistance(findDistance(userMarker.index, businessMarker.index).distanceMiles);
         }
@@ -66,7 +61,6 @@ const QuizGoogleMap = React.forwardRef((props, ref) => {
 
     React.useEffect(() => {
         $.get('/get-distances.json', (res) => {
-            console.log('get distances')
             if (res.msg == 'success') {
                 setDistanceResponse(res.distance_matrix);
                 console.log('success')
@@ -213,7 +207,7 @@ const QuizGoogleMap = React.forwardRef((props, ref) => {
 
     return (
         <React.Fragment>
-            {duration && <div id="distance">It will take {userMarker.name} {Number((duration).toFixed(0))} minutes ({Number((distance).toFixed(1))} miles) to drive to {businessMarker.name}.</div>}
+            {(duration && distance) ? <div id="distance">It will take {userMarker.name} {Number((duration).toFixed(0))} minutes ({Number((distance).toFixed(1))} miles) to drive to {businessMarker.name}.</div> : null}
             <div id="google-map-quiz" className="google-map" />
         </React.Fragment>
     )
