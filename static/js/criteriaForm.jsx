@@ -1,8 +1,6 @@
 // https://www.w3schools.com/html/html5_geolocation.asp
 // https://web.dev/how-to-use-local-https/
 
-// TODO: add criteria form - one restaurant.
-// TODO (nice to have): show list of your saved restaurants
 
 function CriteriaFormContainer(props) {
     const [location, setLocation] = React.useState(false);
@@ -39,11 +37,13 @@ function CriteriaFormContainer(props) {
     return (
         <React.Fragment>
             <ErrorMessage ref={errorMsgRef} />
+            <img id="tempura-img" src='/static/img/tempura.svg'></img>
             <div id="criteria-form-container" className="center">
                 {isHost && <div id="invite-link"><div>Share this link with everyone participating:</div><div id="shared-link">{sharedLink}</div><button className='btn' onClick={copyLink}>Copy Link</button></div>}
                 <hr />
                 <CriteriaForm errorMsgRef={errorMsgRef} />
             </div>
+            <img id="egg-img" src='/static/img/egg.svg'></img>
         </React.Fragment>
     );
 }

@@ -48,11 +48,13 @@ function Invite(props) {
         <React.Fragment>
             <ErrorMessage ref={errorMsgRef} />
             <Login noCloseBtn={true} loggedInSuccess={loggedInSuccess} />
+            <img id="tempura-img" src='/static/img/tempura.svg'></img>
             <div id="invite-component" className="center">
                 {isHost && <div id="invite-link"><div>Share this link with everyone participating:</div><div id="shared-link">{url}</div><button className='btn' onClick={copyLink}>Copy Link</button></div>}
                 <hr />
                 <UserLocationInput errorMsgRef={errorMsgRef} url={url} />
             </div>
+            <img id="egg-img" src='/static/img/egg4.svg'></img>
         </React.Fragment >
     );
 }
