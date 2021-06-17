@@ -46,10 +46,10 @@ def get_users_locations(yelphelper_session_id, user_id=None):
         if (user.lat and user.lng):
             if user_id == u.user_id:
                 users_locations.append(
-                    {"fname": u.fname, "lat": user.lat, "lng": user.lng, "me": True})
+                    {"fname": u.fname, "lat": user.lat, "lng": user.lng, "me": True, "in_waiting_room": user.in_waiting_room})
             else:
                 users_locations.append(
-                    {"fname": u.fname, "lat": user.lat, "lng": user.lng, "me": False})
+                    {"fname": u.fname, "lat": user.lat, "lng": user.lng, "me": False, "in_waiting_room": user.in_waiting_room})
     return users_locations
 
 
