@@ -174,6 +174,14 @@ def add_search_criteria():
 
 @app.route('/waiting-room-start')
 def waiting_room_start():
+    user_id = session['user_id']
+    yelphelper_session_id = session['yelphelper_session_id']
+    user_yelphelper_session = UserYelpHelperSession.query.filter(
+        UserYelpHelperSession.user_id == user_id, UserYelpHelperSession.yelphelper_session_id == yelphelper_session_id).first()
+    user_yelphelper_session.in_waiting_room = True
+    db.session.add(user_yelphelper_session)
+    db.session.commit()
+
     return render_template('waiting_room_start.html')
 
 
@@ -223,12 +231,11 @@ def check_duration():
         yelphelper_session.max_duration = max_duration
         db.session.add(yelphelper_session)
         db.session.commit()
-        msg="success"
+        msg = "success"
     else:
-        msg="fail"
+        msg = "fail"
 
-
-    return {'msg':msg}
+    return {'msg': msg}
 
 
 @app.route('/retrieve-businesses.json', methods=['POST'])
@@ -513,6 +520,7 @@ def show_result():
 @app.route('/results.json')
 def calculate_results():
     yelphelper_session_id = session['yelphelper_session_id']
+    yelphelper_session = YelpHelperSession.query.get(yelphelper_session_id)
     ordered_total_scores = crud.get_ordered_total_scores(
         yelphelper_session_id)
     total_scores = []
@@ -521,6 +529,12 @@ def calculate_results():
         total_scores.append({"alias": b.alias, "yelp_id": b.yelp_id, "name": b.name, "yelp_rating": b.yelp_rating,
                             "review_count": b.review_count, "image_url": b.image_url, "url": b.url, "total_score": total_score.total_score,
                              "lat": b.lat, "lng": b.lng})
+    users_locations = crud.get_users_locations(yelphelper_session_id)
+    distance_matrix_response = distance_matrix_api.return_distances(
+        users_locations, total_scores)
+    yelphelper_session.distance_matrix = distance_matrix_response
+    db.session.add(yelphelper_session)
+    db.session.commit()
 
     return {"total_scores": total_scores}
 
@@ -621,8 +635,21 @@ def get_user_data():
     email = user.email
     password = user.password
 
-
     return {"fname": fname, "lname": lname, "phone": phone, "email": email, "password": password}
+
+
+@app.route('/edit-user-data.json', methods=['POST'])
+def edit_user_data():
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+    user.fname = request.form.get('fname')
+    user.lname = request.form.get('lname')
+    user.email = request.form.get('email')
+    user.phone = request.form.get('phone')
+    db.session.add(user)
+    db.session.commit()
+    return {"msg": "success", "user": {'fname': user.fname, 'lname': user.lname, 'email': user.email, 'phone': user.phone, 'password': user.password}}
+
 
 if __name__ == '__main__':
     model.connect_to_db(app)
