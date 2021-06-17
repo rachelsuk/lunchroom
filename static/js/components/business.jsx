@@ -48,10 +48,11 @@ function Business(props) {
                     <div>
                         <img src={`${business.image_url}`} width="200" height="200" />
                     </div>
-                    {(business.review_count && business.yelp_rating) && <ul className='business-details'>
-                        <li>Number of Yelp Reviews: {business.review_count}</li>
-                        <li>Number of Yelp Stars: {business.yelp_rating}</li>
-                    </ul>}
+                    {(business.review_count && business.yelp_rating) && <div className='business-details'>
+                        <div><img src={`/static/img/yelp_stars/small_${business.yelp_rating}@2x.png`}></img><img src="/static/img/yelp-logo.png" width="75px"></img></div>
+                        <div>Based on {business.review_count} Reviews</div>
+
+                    </div>}
                 </div><div className="business-btns">
                     {showSaveButton && <button className="btn business-btn" onClick={addToSavedBusinesses}>Add to my saved restaurants</button>}
                     {showAddButton && <button className="btn business-btn" onClick={addBusiness}>Add Restaurant</button>}
