@@ -45,8 +45,10 @@ Sign up to use the Yelp Fusion API and Google Maps API.
 
 Save your Yelp Fusion API key and a random string APP_KEY in a file called secrets.sh using this format:
 
-`$ export YELP_KEY="YOUR_KEY_NAME_HERE"`
-`$ export APP_KEY="RANDOM_STRING"`
+```
+$ export YELP_KEY="YOUR_KEY_NAME_HERE"
+$ export APP_KEY="RANDOM_STRING"
+```
 
 Replace the existing Google Maps API key with your API key on line 6 in the googlemapsapi.html file
 
