@@ -386,6 +386,7 @@ input[type="radio"].price:hover + label {
   line-height: normal;
   width: 50%;
   margin: auto;
+  margin-bottom: 2em;
 }
 
 #business-quiz-container {
@@ -692,6 +693,23 @@ h6 {
   }
 }
 
+@media only screen and (max-width: 1630px) {
+  #homepage-table-img {
+    position: fixed;
+    right: -150px;
+    top: 50px;
+    width: 55em;
+    height: 55em;
+    transform: rotate(5deg);
+  }
+  #homepage-blob-img {
+    position: fixed;
+    right: -150px;
+    top: 50px;
+    z-index: -1;
+  }
+}
+
 #distance {
   word-wrap: normal;
   max-width: 100%;
@@ -856,4 +874,8 @@ button[disabled] {
   border-radius: 50%;
   display: inline-block;
   margin-bottom: 15px;
+}
+
+#waiting-finish-heading {
+  margin-top: 25%;
 }
