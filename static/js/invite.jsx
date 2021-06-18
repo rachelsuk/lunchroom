@@ -29,7 +29,7 @@ function Invite(props) {
         const sharedLink = document.querySelector("#shared-link");
         const sharedlinkText = sharedLink.textContent;
         navigator.clipboard.writeText(sharedlinkText);
-        errorMsgRef.current.showErrorMessage("Link has been copied");
+        errorMsgRef.current.showErrorMessage("Link has been copied to clipboard");
     }
 
     const loggedInSuccess = () => {
@@ -54,7 +54,7 @@ function Invite(props) {
                 <hr />
                 <UserLocationInput errorMsgRef={errorMsgRef} url={url} />
             </div>
-            <img id="egg-img" src='/static/img/egg4.svg'></img>
+            <img id="egg-img" src='/static/img/egg.svg'></img>
         </React.Fragment >
     );
 }
