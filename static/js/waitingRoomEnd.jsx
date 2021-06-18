@@ -13,7 +13,11 @@ function WaitingRoomEnd(props) {
 
     }, [])
 
-    return (<div id="waiting-finish-heading" className='center'>Waiting for all participants to finish...</div>)
+    return (<React.Fragment>
+        <img id="tempura-img" src='/static/img/tempura.svg'></img>
+        <div id="waiting-finish-heading" className='center'>Waiting for all participants to finish...</div>
+        <img id="egg-img" src='/static/img/egg.svg'></img>
+    </React.Fragment>)
 }
 
 ReactDOM.render(
