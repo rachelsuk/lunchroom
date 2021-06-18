@@ -41,7 +41,7 @@ After cloning the repo in your virtualenv, install dependencies:
 
 `$ pip3 install -r requirements.txt`
 
-Sign up to use the [Yelp Fusion API] (https://www.yelp.com/fusion) and [Google Maps Platform APIs] (https://developers.google.com/maps).
+Sign up to use the [Yelp Fusion API](https://www.yelp.com/fusion) and [Google Maps Platform APIs](https://developers.google.com/maps).
 
 Save your Yelp Fusion API key and a random string APP_KEY in a file called secrets.sh using this format:
 
