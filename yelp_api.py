@@ -9,7 +9,7 @@ def business_search(lat, lng, search_term=None, price=None, min_rating=None):
     # Use form data from the user to populate any search parameters
     headers = {'Authorization': 'Bearer %s' % YELP_KEY}
     payload = {'term': search_term, 'latitude': lat, 'longitude': lng,
-               'price': price, 'limit': 50, 'radius': 40000}
+               'price': price, 'limit': 20, 'radius': 40000}
     # Make a request to the Business Search endpoint to search for businesses
     res = requests.get(url, params=payload, headers=headers)
     search_results = res.json()
