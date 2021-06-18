@@ -49,7 +49,7 @@ function ResultsContainer(props) {
                 <div id="google-map-result" className="google-map-container">
                     <GoogleMap businesses={businessesResults} usersLocations={usersLocations} ref={mapRef} setBusinessIndex={setBusinessIndex} />
                 </div><div className="business-result-container">
-                    {(businessesInfo && businessIndex == 0) && <div style={{ margin: "1em", "font-size": "2em" }}>TOP CHOICE</div>}
+                    {(businessesInfo && businessIndex == 0) && <div style={{ margin: "1em", fontSize: "2em" }}>TOP CHOICE</div>}
                     {businessesInfo && <div>{businessesInfo[businessIndex]}</div>}
                     {businessIndex != 0 && <button className="btn prev-next-btns" onClick={showPreviousBusiness}>&laquo; Previous</button>}
                     {businessIndex < (businessesInfo.length - 1) && <button className="btn prev-next-btns" onClick={showNextBusiness}>Next &raquo;</button>}
