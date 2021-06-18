@@ -7,8 +7,8 @@ locations and food preferences.
 
 So you want to finally meet up with a couple of your friends for lunch now that COVID-19 restrictions have lowered. You live in San Jose, one of your friends live in Fremont and the other lives in Palo Alto. You're craving japanese food, your friend wants tacos and the other specifically wants Mendocino Farms. Everyone is only willing to drive 20 minutes to the restaurant. Two questions are probably going through your head.
 
-1. which area should we eat in?
-2. what should we eat?
+1. Which area should we eat in?
+2. Which restaurant should we eat at?
 
 LunchRoom is a streamlined application that simplifies this decision making process. The app gathers data from the users about their locations and food preferences, and finds optimal restaurants within the desired driving distance using the Google Maps Platform and Yelp Fusion APIs. Users are provided with information about the restaurants (e.g. number of stars/reviews on Yelp, distance from each user) and asked to rate how much they want to eat at each restaurant. Ratings are then aggregated and the results are displayed to the users.
 
@@ -18,8 +18,12 @@ LunchRoom is a streamlined application that simplifies this decision making proc
 - Python -- Flask, SqlAlchemy
 - Database -- PostgreSQL
 - Styling -- HTML/CSS, Bootstrap
-- Other Frameworks and APIs -- Google Maps Platform APIs (Maps Javascript API, Distance Matrix API, Geocoding API), Yelp
-  Fusion API
+- Other Frameworks and APIs
+  - Google Maps Platform APIs
+    - Maps Javascript API
+    - Distance Matrix API
+    - Geocoding API
+  - Yelp Fusion API
 
 ## Feature Highlights :bulb:
 
