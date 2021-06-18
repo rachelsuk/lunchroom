@@ -52,6 +52,13 @@ $ export APP_KEY="RANDOM_STRING"
 
 Replace the existing Google Maps API key with your API key on line 6 in the googlemapsapi.html file
 
+```
+<script
+defer
+src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_NAME_HERE&libraries=map">
+</script>
+```
+
 Then, run the Flask server to start the web app:
 
 `$ python3 server.py`
