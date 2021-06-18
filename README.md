@@ -5,7 +5,7 @@ locations and food preferences.
 
 ## Project Background :bento:
 
-So you want to finally meet up with a couple of your friends for lunch now that COVID-19 restrictions have lowered. You live in San Jose, one of your friends live in Fremont and the other lives in Palo Alto. You're craving japanese food, your friend wants tacos and the other specifically wants Mendocino Farms. Everyone is only willing to drive 20 minutes to the restaurant. Two questions are probably going through your head.
+So you want to finally meet up with a couple of your friends for lunch now that COVID-19 restrictions have lifted. You live in San Jose, one of your friends live in Fremont and the other lives in Palo Alto. You're craving japanese food, one of your friends wants tacos and the other specifically wants Mendocino Farms. Everyone is only willing to drive 20 minutes to the restaurant. Two questions are probably going through your head.
 
 1. Which area should we eat in?
 2. Which restaurant should we eat at?
@@ -25,20 +25,23 @@ LunchRoom is a streamlined application that simplifies this decision making proc
     - Geocoding API
   - Yelp Fusion API
 
-## Feature Highlights :bulb:
+## User Flow :bulb:
 
-- Gathers information about users' locations and food preferences
+1. Gathers information about users' locations and food preferences
 
   <!-- ![GIF of routine entry](static/img/docs/routine.gif) -->
 
-- Host inputs the maximum driving distance
-  <!-- ![GIF of dashboard](static/img/docs/dashboard.gif) -->
+2. Waiting room updates in real-time each time a user joins the session
+<!-- ![GIF of routine entry](static/img/docs/routine.gif) -->
 
-- Users rate each restaurant
+3. Session host inputs the maximum driving distance
+<!-- ![GIF of dashboard](static/img/docs/dashboard.gif) -->
+
+4. Users rate each restaurant
 
   <!-- ![GIF of sunburst](static/img/docs/sunburst.gif) -->
 
-- Results are displayed to the users
+5. Results are displayed to the users
 
   <!-- ![GIF of sunburst](static/img/docs/sunburst.gif) -->
 
