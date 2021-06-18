@@ -317,7 +317,9 @@ def retrieve_businesses():
                     print(businesses_left)
             if businesses_left <= 0:
                 break
-        if len(all_businesses) >= 25:
+        if businesses_left <= 0:
+            break
+        elif len(all_businesses) >= 25:
             businesses_batch = all_businesses[:25]
             all_businesses[:25] = []
         elif 25 > len(all_businesses) > 0:
