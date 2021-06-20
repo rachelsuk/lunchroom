@@ -20,32 +20,36 @@ LunchRoom is a streamlined application that simplifies this decision making proc
 - Python -- Flask, SqlAlchemy
 - Database -- PostgreSQL
 - Styling -- HTML/CSS, Bootstrap
-- Other Frameworks and APIs
-  - Google Maps Platform APIs
-    - Maps Javascript API
-    - Distance Matrix API
-    - Geocoding API
-  - Yelp Fusion API
+
+## APIs :fax:
+
+- Google Maps Platform APIs
+  - Maps Javascript API
+  - Distance Matrix API
+  - Geocoding API
+- Yelp Fusion API
 
 ## User Flow :bulb:
 
 1. Gathers information about users' locations and food preferences
 
-![GIF of invite and criteria form pages](static/img/docs/invite_criteria.gif)
+![GIF of invite and criteria form ](static/img/docs/invite_criteria.gif)
 
 2. Waiting room updates in real-time each time a user joins the session
-<!-- ![GIF of routine entry](static/img/docs/routine.gif) -->
+
+![GIF of waiting room](static/img/docs/waiting_room.gif)
 
 3. Session host inputs the maximum driving distance
-<!-- ![GIF of dashboard](static/img/docs/dashboard.gif) -->
+
+![GIF of maximum distance form](static/img/docs/max_distance.gif)
 
 4. Users rate each restaurant
 
-  <!-- ![GIF of sunburst](static/img/docs/sunburst.gif) -->
+![GIF of ratings quiz](static/img/docs/quiz.gif)
 
 5. Results are displayed to the users
 
-  <!-- ![GIF of sunburst](static/img/docs/sunburst.gif) -->
+![GIF of results](static/img/docs/results.gif)
 
 ## Quickstart :clipboard:
 
