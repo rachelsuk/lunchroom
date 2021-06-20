@@ -3,6 +3,8 @@
 LunchRoom is a web application built with React and Flask to help groups of users decide where to eat based on their
 locations and food preferences.
 
+![img of homepage](static/img/docs/homepage.png)
+
 ## Project Background :bento:
 
 So you want to finally meet up with a couple of your friends for lunch now that COVID-19 restrictions have lifted. You live in San Jose, one of your friends live in Fremont and the other lives in Palo Alto. You're craving japanese food, one of your friends wants tacos and the other specifically wants Mendocino Farms. Everyone is only willing to drive 20 minutes to the restaurant. Two questions are probably going through your head.
