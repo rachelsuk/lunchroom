@@ -62,7 +62,10 @@ function Invite(props) {
 function UserLocationInput(props) {
     function getExactCoords() {
         const exactLocationBtn = document.querySelector("#exact-location-btn");
-        exactLocationBtn.innerHTML = 'Getting your location...';
+        exactLocationBtn.innerHTML = (
+            `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+             Loading...`
+        )
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 function (position) {

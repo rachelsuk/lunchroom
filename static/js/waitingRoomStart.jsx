@@ -68,7 +68,9 @@ function WaitingRoomStart(props) {
     function checkDuration(evt) {
         evt.preventDefault();
         const submitBtn = document.querySelector(".submit-btn");
-        submitBtn.innerHTML = 'loading..';
+        submitBtn.innerHTML = (
+            `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+             Loading...`)
 
         const durationData = $('#max-duration-form').serialize();
 
