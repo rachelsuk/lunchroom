@@ -31,7 +31,7 @@ LunchRoom is a streamlined application that simplifies this decision making proc
 
 1. Gathers information about users' locations and food preferences
 
-  <!-- ![GIF of routine entry](static/img/docs/routine.gif) -->
+![GIF of invite and criteria form pages](static/img/docs/invite+criteria.gif)
 
 2. Waiting room updates in real-time each time a user joins the session
 <!-- ![GIF of routine entry](static/img/docs/routine.gif) -->
