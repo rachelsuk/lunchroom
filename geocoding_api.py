@@ -9,6 +9,9 @@ def get_zipcode_coords(zipcode):
 
     response = requests.request(
         "GET", url, params=payload).json()
+    
+    print(response)
+    print(response.get("status"))
 
     result = response.get("results")
 
